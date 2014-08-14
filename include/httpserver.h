@@ -1,0 +1,77 @@
+/*****************************************************************************
+ * Copyright (C) 2014 Visualink
+ *
+ * Authors: Adrien Maglo <adrien@visualink.io>
+ *
+ * This file is part of Pastec.
+ *
+ * Pastec is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pastec is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
+ *****************************************************************************/
+
+#ifndef HTTPSERVER_H
+#define HTTPSERVER_H
+
+#include <vector>
+#include <string>
+#include <microhttpd.h>
+
+using namespace std;
+
+class RequestHandler;
+struct ConnectionInfo;
+
+
+#define GET             0
+#define POST            1
+#define DELETE          2
+#define PUT             3
+
+class HTTPServer
+{
+public:
+    HTTPServer(RequestHandler *requestHandler, unsigned i_port);
+    ~HTTPServer();
+    int run();
+    int stop();
+
+private:
+    static int answerToConnection(void *cls, MHD_Connection *connection,
+                                  const char *url, const char *method,
+                                  const char *version, const char *upload_data,
+                                  size_t *upload_data_size, void **con_cls);
+    static void requestCompleted(void *cls, MHD_Connection *connection,
+                                 void **con_cls, MHD_RequestTerminationCode toe);
+    static int sendAnswer(struct MHD_Connection *connection, ConnectionInfo &conInfo);
+
+    MHD_Daemon *daemon;
+    RequestHandler *requestHandler;
+    pthread_cond_t *p_cond;
+    pthread_mutex_t *p_cond_mutex;
+
+    unsigned i_port;
+};
+
+
+struct ConnectionInfo
+{
+    int connectionType;
+    string url;
+    struct MHD_PostProcessor *postprocessor;
+    string answerString;
+    int answerCode;
+
+    vector<char> uploadedData;
+};
+
+#endif // HTTPSERVER_H
