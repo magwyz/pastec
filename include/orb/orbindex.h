@@ -46,7 +46,7 @@ using namespace std::tr1;
 class ORBIndex : public Index
 {
 public:
-    ORBIndex();
+    ORBIndex(string indexPath);
     virtual ~ORBIndex();
     void getImagesWithVisualWords(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
                                   unordered_map<u_int32_t, vector<Hit> > &indexHitsForReq);

@@ -31,7 +31,7 @@
 #include "messages.h"
 
 
-ORBIndex::ORBIndex()
+ORBIndex::ORBIndex(string indexPath)
 {
     // Init the mutex.
     pthread_rwlock_init(&rwLock, NULL);
@@ -40,7 +40,7 @@ ORBIndex::ORBIndex()
     for (unsigned i = 0; i < NB_VISUAL_WORDS; ++i)
         nbOccurences[i] = 0;
 
-    readIndex(DEFAULT_INDEX_PATH);
+    readIndex(indexPath);
 }
 
 

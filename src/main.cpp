@@ -42,7 +42,7 @@ void intHandler(int signum) {
 void printUsage()
 {
     cout << "Usage :" << endl
-         << "./PastecIndex [-p portNumber] visualWordList" << endl;
+         << "./PastecIndex [-p portNumber] [-i indexPath] visualWordList" << endl;
 }
 
 
@@ -65,6 +65,7 @@ int main(int argc, char** argv)
 
     unsigned i_port = 4212;
     string visualWordPath;
+    string indexPath(DEFAULT_INDEX_PATH);
 
     int i = 1;
     while (i < argc)
@@ -73,6 +74,11 @@ int main(int argc, char** argv)
         {
             EXIT_IF_LAST_ARGUMENT()
             i_port = atoi(argv[++i]);
+        }
+        else if (string(argv[i]) == "-i")
+        {
+            EXIT_IF_LAST_ARGUMENT()
+            indexPath = argv[++i];
         }
         else if (i == argc - 1)
         {
@@ -86,7 +92,7 @@ int main(int argc, char** argv)
         ++i;
     }
 
-    Index *index = new ORBIndex();
+    Index *index = new ORBIndex(indexPath);
     ORBWordIndex *wordIndex = new ORBWordIndex(visualWordPath);
     FeatureExtractor *ife = new ORBFeatureExtractor((ORBIndex *)index, wordIndex);
     Searcher *is = new ORBSearcher((ORBIndex *)index, wordIndex);
