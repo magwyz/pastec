@@ -130,7 +130,7 @@ u_int32_t ORBIndex::addImage(unsigned i_imageId, list<HitForward> hitList)
         cout << "Image " << hitList.begin()->i_imageId << " added: "
              << hitList.size() << " hits." << endl;
 
-    return OK;
+    return IMAGE_ADDED;
 }
 
 
@@ -174,7 +174,7 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
 
     cout << "Image " << i_imageId << " removed." << endl;
 
-    return OK;
+    return IMAGE_REMOVED;
 }
 
 
