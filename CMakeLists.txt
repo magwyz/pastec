@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project(PastecIndex)
+project(Pastec)
 
 include_directories(include include/orb)
 
@@ -38,10 +38,10 @@ find_package(OpenCV REQUIRED)
 find_package(microhttpd REQUIRED)
 find_package(jsoncpp REQUIRED)
 
-add_executable(PastecIndex ${SOURCES} ${HEADERS})
+add_executable(pastec ${SOURCES} ${HEADERS})
 
-target_link_libraries(PastecIndex ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(PastecIndex ${OpenCV_LIBS})
-target_link_libraries(PastecIndex ${LIBMICROHTTPD_LIBRARY})
-target_link_libraries(PastecIndex ${LIBJSONCPP_LIBRARY})
+target_link_libraries(pastec ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(pastec ${OpenCV_LIBS})
+target_link_libraries(pastec ${LIBMICROHTTPD_LIBRARY})
+target_link_libraries(pastec ${LIBJSONCPP_LIBRARY})
 
