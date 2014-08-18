@@ -169,7 +169,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
         else if (data["type"] == "CLEAR")
             i_ret = index->clear();
         else
-            i_ret = ERROR_GENERIC;
+            i_ret = MISFORMATTED_REQUEST;
 
         ret["type"] = Converter::codeToString(i_ret);
     }
@@ -187,14 +187,14 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
             i_ret = PONG;
         }
         else
-            i_ret = ERROR_GENERIC;
+            i_ret = MISFORMATTED_REQUEST;
 
         ret["type"] = Converter::codeToString(i_ret);
     }
     else
     {
         conInfo.answerCode = MHD_HTTP_INTERNAL_SERVER_ERROR;
-        ret["type"] = Converter::codeToString(ERROR_GENERIC);
+        ret["type"] = Converter::codeToString(MISFORMATTED_REQUEST);
     }
 
     conInfo.answerString = JsonToString(ret);

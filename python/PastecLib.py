@@ -92,6 +92,8 @@ class PastecConnection:
     def raiseExceptionIfNeeded(self, val):
         if val == "ERROR_GENERIC":
             raise PastecException("Generic error.")
+        elif val == "MISFORMATTED_REQUEST":
+            raise PastecException("Misformatted request.")
         elif val == "TOO_MANY_CLIENTS":
             raise PastecException("Too many clients connected to the server.")
         elif val == "IMAGE_DATA_TOO_BIG":
