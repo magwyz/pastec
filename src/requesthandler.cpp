@@ -111,6 +111,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     string p_image[] = {"index", "images", "IDENTIFIER", ""};
     string p_searchImage[] = {"index", "searcher", ""};
     string p_ioIndex[] = {"index", "io", ""};
+    string p_root[] = {""};
 
     Json::Value ret;
     conInfo.answerCode = MHD_HTTP_OK;
@@ -167,6 +168,24 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
             i_ret = index->write(data["index_path"].asString());
         else if (data["type"] == "CLEAR")
             i_ret = index->clear();
+        else
+            i_ret = ERROR_GENERIC;
+
+        ret["type"] = Converter::codeToString(i_ret);
+    }
+    else if (testURIWithPattern(parsedURI, p_root)
+             && conInfo.connectionType == POST)
+    {
+        string dataStr(conInfo.uploadedData.begin(),
+                       conInfo.uploadedData.end());
+
+        Json::Value data = StringToJson(dataStr);
+        u_int32_t i_ret;
+        if (data["type"] == "PING")
+        {
+            cout << "Ping received." << endl;
+            i_ret = PONG;
+        }
         else
             i_ret = ERROR_GENERIC;
 

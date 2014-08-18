@@ -84,6 +84,11 @@ class PastecConnection:
         imageIds = ret["image_ids"]
         return imageIds
 
+    def ping(self):
+        s = json.dumps({"type" : "PING"})
+        ret = self.request("", "POST", bytearray(s, "UTF-8"))
+        self.raiseExceptionIfNeeded(ret["type"])
+
     def raiseExceptionIfNeeded(self, val):
         if val == "ERROR_GENERIC":
             raise PastecException("Generic error.")
