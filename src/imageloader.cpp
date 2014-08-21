@@ -22,6 +22,7 @@
 #include <iostream>
 #include <vector>
 
+#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
 #include "imageloader.h"
@@ -57,8 +58,20 @@ u_int32_t ImageLoader::loadImage(unsigned i_imgSize, char *p_imgData, Mat &img)
     if (i_imgWidth > 1000
         || i_imgHeight > 1000)
     {
-        cout << "Image too large." << endl;
-        return IMAGE_SIZE_TOO_BIG;
+        cout << "Image too large, resizing." << endl;
+        Size size;
+        if (i_imgWidth > i_imgHeight)
+        {
+            size.width = 1000;
+            size.height = (float)i_imgHeight / i_imgWidth * 1000;
+        }
+        else
+        {
+            size.width = (float)i_imgWidth / i_imgHeight * 1000;
+            size.height = 1000;
+        }
+        resize(img, img, size);
+        return OK;
     }
 
 #if 1

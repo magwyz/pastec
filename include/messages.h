@@ -38,7 +38,6 @@ enum MessagesOut
 
     IMAGE_DATA_TOO_BIG =                0x10050100,
     IMAGE_NOT_INDEXED =                 0x10050200,
-    IMAGE_SIZE_TOO_BIG =                0x10050300,
     IMAGE_NOT_DECODED =                 0x10050400,
     IMAGE_SIZE_TOO_SMALL =              0x10050500,
     IMAGE_NOT_FOUND =                   0x10050700,
@@ -76,7 +75,6 @@ public:
 
             case IMAGE_DATA_TOO_BIG: s = "IMAGE_DATA_TOO_BIG"; break;
             case IMAGE_NOT_INDEXED: s = "IMAGE_NOT_INDEXED"; break;
-            case IMAGE_SIZE_TOO_BIG: s = "IMAGE_SIZE_TOO_BIG"; break;
             case IMAGE_NOT_DECODED: s = "IMAGE_NOT_DECODED"; break;
             case IMAGE_SIZE_TOO_SMALL: s = "IMAGE_SIZE_TOO_SMALL"; break;
             case IMAGE_NOT_FOUND: s = "IMAGE_NOT_FOUND"; break;

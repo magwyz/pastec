@@ -100,8 +100,6 @@ class PastecConnection:
             raise PastecException("Image data size too big.")
         elif val == "IMAGE_NOT_INDEXED":
             raise PastecException("Image not indexed.")
-        elif val == "IMAGE_SIZE_TOO_BIG":
-            raise PastecException("Image dimenssions too big.")
         elif val == "IMAGE_NOT_DECODED":
             raise PastecException("The query image could not be decoded.")
         elif val == "IMAGE_SIZE_TOO_SMALL":
