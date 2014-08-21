@@ -75,8 +75,8 @@ u_int32_t ImageLoader::loadImage(unsigned i_imgSize, char *p_imgData, Mat &img)
     }
 
 #if 1
-    if (i_imgWidth < 200
-        || i_imgHeight < 200)
+    if (i_imgWidth < 150
+        || i_imgHeight < 150)
     {
         cout << "Image too small." << endl;
         return IMAGE_SIZE_TOO_SMALL;
