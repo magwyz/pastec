@@ -51,7 +51,11 @@ ORBIndex::ORBIndex(string indexPath)
  */
 unsigned ORBIndex::getWordNbOccurences(unsigned i_wordId)
 {
-    return nbOccurences[i_wordId];
+    pthread_rwlock_rdlock(&rwLock);
+    assert(i_wordId < NB_VISUAL_WORDS);
+    unsigned i_ret = nbOccurences[i_wordId];
+    pthread_rwlock_unlock(&rwLock);
+    return i_ret;
 }
 
 
