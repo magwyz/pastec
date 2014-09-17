@@ -62,6 +62,8 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     if (i_ret != OK)
         return i_ret;
 
+    //equalizeHist( img, img );
+
     vector<KeyPoint> keypoints;
     Mat descriptors;
 

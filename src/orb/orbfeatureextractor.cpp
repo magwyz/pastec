@@ -45,6 +45,8 @@ u_int32_t ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_im
     if (i_ret != OK)
         return i_ret;
 
+    //equalizeHist( img, img );
+
     vector<KeyPoint> keypoints;
     Mat descriptors;
 
