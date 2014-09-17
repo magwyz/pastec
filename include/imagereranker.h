@@ -104,6 +104,7 @@ public:
 
 
 #define HISTOGRAM_NB_BINS 32
+#define DIFF_MIN -360.0f / (2.0f * HISTOGRAM_NB_BINS)
 
 struct Histogram
 {

@@ -67,7 +67,7 @@ void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
             {
                 const u_int16_t i_angle2 = hitIndex[i].i_angle;
                 float f_diff = angleDiff(i_angle1, i_angle2);
-                unsigned bin = f_diff / 360 * HISTOGRAM_NB_BINS;
+                unsigned bin = (f_diff - DIFF_MIN) / 360 * HISTOGRAM_NB_BINS;
                 assert(bin < HISTOGRAM_NB_BINS);
 
                 histograms[i_imageId].bins[bin]++;
@@ -86,7 +86,8 @@ void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
     {
         const unsigned i_imageId = it->first;
         const Histogram &histogram = it->second;
-        unsigned i_maxVal = *max_element(histogram.bins, histogram.bins + HISTOGRAM_NB_BINS);
+        unsigned i_binMax = max_element(histogram.bins, histogram.bins + HISTOGRAM_NB_BINS) - histogram.bins;
+        float i_maxVal = histogram.bins[i_binMax];
         if (i_maxVal > 10)
         {
 #if 1
@@ -166,11 +167,13 @@ float ImageReranker::angleDiff(unsigned i_angle1, unsigned i_angle2)
 
     // Compute the difference between the two angles.
     float diff = i1 - i2;
-    if (diff < 0)
+    if (diff < DIFF_MIN)
         diff += 360;
+    else if (diff >= 360 + DIFF_MIN)
+        diff -= 360;
 
-    assert(diff >= 0);
-    assert(diff < 360);
+    assert(diff >= DIFF_MIN);
+    assert(diff < 360 + DIFF_MIN);
 
     return diff;
 }
