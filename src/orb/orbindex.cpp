@@ -168,6 +168,7 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
             if (it->i_imageId == i_imageId)
             {
                 totalNbRecords--;
+                nbOccurences[i_wordId]--;
                 hits.erase(it);
                 break;
             }
