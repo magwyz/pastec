@@ -24,7 +24,6 @@
 #include <math.h>
 
 #include <algorithm>
-#include <set>
 
 #include "imagereranker.h"
 
@@ -35,15 +34,15 @@ void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
                            priority_queue<SearchResult> &rankedResultsOut,
                            unsigned i_nbResults)
 {
-    set<u_int32_t> firstImageIds;
+    unordered_set<u_int32_t> firstImageIds;
 
     // Extract the first i_nbResults ranked images.
     getFirstImageIds(rankedResultsIn, i_nbResults, firstImageIds);
 
-    map<u_int32_t, RANSACTask> imgTasks;
+    unordered_map<u_int32_t, RANSACTask> imgTasks;
 
     // Compute the histograms.
-    map<u_int32_t, Histogram> histograms; // key: the image id, value: the corresponding histogram.
+    unordered_map<u_int32_t, Histogram> histograms; // key: the image id, value: the corresponding histogram.
 
     for (unordered_map<u_int32_t, list<Hit> >::const_iterator it = imagesReqHits.begin();
          it != imagesReqHits.end(); ++it)
@@ -70,18 +69,20 @@ void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
                 unsigned bin = (f_diff - DIFF_MIN) / 360 * HISTOGRAM_NB_BINS;
                 assert(bin < HISTOGRAM_NB_BINS);
 
-                histograms[i_imageId].bins[bin]++;
-                histograms[i_imageId].i_total++;
+                Histogram &histogram = histograms[i_imageId];
+                histogram.bins[bin]++;
+                histogram.i_total++;
 
                 const Point2f point2(hitIndex[i].x, hitIndex[i].y);
-                imgTasks[i_imageId].points1.push_back(point1);
-                imgTasks[i_imageId].points2.push_back(point2);
+                RANSACTask &imgTask = imgTasks[i_imageId];
+                imgTask.points1.push_back(point1);
+                imgTask.points2.push_back(point2);
             }
         }
     }
 
     // Rank the images according to their histogram.
-    for (map<unsigned, Histogram>::const_iterator it = histograms.begin();
+    for (unordered_map<unsigned, Histogram>::const_iterator it = histograms.begin();
          it != histograms.end(); ++it)
     {
         const unsigned i_imageId = it->first;
@@ -142,7 +143,7 @@ private:
  * @param firstImageIds a set to return the image ids.
  */
 void ImageReranker::getFirstImageIds(priority_queue<SearchResult> &rankedResultsIn,
-                                     unsigned i_nbResults, set<u_int32_t> &firstImageIds)
+                                     unsigned i_nbResults, unordered_set<u_int32_t> &firstImageIds)
 {
     unsigned i_res = 0;
     while(!rankedResultsIn.empty()

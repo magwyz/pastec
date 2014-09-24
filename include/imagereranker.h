@@ -27,7 +27,7 @@
 #include <queue>
 #include <list>
 #include <tr1/unordered_map>
-#include <set>
+#include <tr1/unordered_set>
 
 #include <opencv2/core/core.hpp>
 
@@ -53,7 +53,7 @@ public:
 private:
     float angleDiff(unsigned i_angle1, unsigned i_angle2);
     void getFirstImageIds(priority_queue<SearchResult> &rankedResultsIn,
-                          unsigned i_nbResults, set<u_int32_t> &firstImageIds);
+                          unsigned i_nbResults, unordered_set<u_int32_t> &firstImageIds);
     cv::Mat findHomography(InputArray _points1, InputArray _points2,
                             int method, double ransacReprojThreshold,
                             OutputArray _mask);
