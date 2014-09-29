@@ -123,6 +123,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
 
     unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
 
+    index->readLock();
     for (unordered_map<u_int32_t, vector<Hit> >::const_iterator it = indexHits.begin();
         it != indexHits.end(); ++it)
     {
@@ -139,6 +140,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
             weights[it2->i_imageId] += f_weight / i_totalNbWords;
         }
     }
+    index->unlock();
 
     priority_queue<SearchResult> rankedResults;
     for (tr1::unordered_map<unsigned, float>::const_iterator it = weights.begin();

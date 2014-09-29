@@ -81,11 +81,15 @@ void ORBIndex::getImagesWithVisualWords(unordered_map<u_int32_t, list<Hit> > &im
 }
 
 
+/**
+ * @brief Return the number of words for an image
+ * @param i_imageId the image id.
+ * @return the number of words.
+ * readLock() and unlock MUST be called before and after calling this function.
+ */
 unsigned ORBIndex::countTotalNbWord(unsigned i_imageId)
 {
-    pthread_rwlock_rdlock(&rwLock);
     unsigned i_ret = nbWords[i_imageId];
-    pthread_rwlock_unlock(&rwLock);
     return i_ret;
 }
 
@@ -349,4 +353,22 @@ u_int32_t ORBIndex::load(string backwardIndexPath)
     readIndex(backwardIndexPath);
 
     return INDEX_LOADED;
+}
+
+
+/**
+ * @brief Lock for reading the index.
+ */
+void ORBIndex::readLock()
+{
+    pthread_rwlock_rdlock(&rwLock);
+}
+
+
+/**
+ * @brief Unlock the index.
+ */
+void ORBIndex::unlock()
+{
+    pthread_rwlock_unlock(&rwLock);
 }

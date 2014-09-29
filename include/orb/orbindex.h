@@ -58,6 +58,8 @@ public:
     u_int32_t write(string backwardIndexPath);
     u_int32_t clear();
     u_int32_t load(string backwardIndexPath);
+    void readLock();
+    void unlock();
 
 private:
     bool readIndex(string backwardIndexPath);
