@@ -74,6 +74,11 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     cout << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
     cout << "Looking for the visual words. " << endl;
 
+    const unsigned i_nbTotalIndexedImages = index->getTotalNbIndexedImages();
+    const unsigned i_maxNbOccurences = i_nbTotalIndexedImages > 10000 ?
+                                       0.15 * i_nbTotalIndexedImages
+                                       : i_nbTotalIndexedImages;
+
     unordered_map<u_int32_t, list<Hit> > imageReqHits; // key: visual word, value: the found angles
     for (unsigned i = 0; i < keypoints.size(); ++i)
     {
@@ -87,6 +92,10 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
         for (unsigned j = 0; j < indices.size(); ++j)
         {
             const unsigned i_wordId = indices[j];
+
+            if (index->getWordNbOccurences(i_wordId) > i_maxNbOccurences)
+                continue;
+
             if (imageReqHits.find(i_wordId) == imageReqHits.end())
             {
                 // Convert the angle to a 16 bit integer.
@@ -103,7 +112,6 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
 
     cout << imageReqHits.size() << " visual words kept for the request." << endl;
 
-    const unsigned i_nbTotalIndexedImages = index->getTotalNbIndexedImages();
     cout << i_nbTotalIndexedImages << " images indexed in the index." << endl;
 
     unordered_map<u_int32_t, vector<Hit> > indexHits; // key: visual word id, values: index hits.
