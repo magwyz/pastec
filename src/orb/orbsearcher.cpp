@@ -67,7 +67,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     vector<KeyPoint> keypoints;
     Mat descriptors;
 
-    ORB(1000, 1.02, 100)(img, noArray(), keypoints, descriptors);
+    ORB(2000, 1.02, 100)(img, noArray(), keypoints, descriptors);
 
     gettimeofday(&t[1], NULL);
 
