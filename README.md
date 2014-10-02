@@ -24,10 +24,10 @@ More precisely, Pastec uses the [patent-free ORB descriptor](https://www.willowg
 Setup
 -----
 
-See [here](http://pastec.io/doc.html#setup).
+See [here](http://pastec.io/doc#setup).
 
 API
 ---
 
-See [here](http://pastec.io/doc.html#api)
+See [here](http://pastec.io/doc#api)
 
