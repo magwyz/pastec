@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef HIT_H
-#define HIT_H
+#ifndef PASTEC_HIT_H
+#define PASTEC_HIT_H
 
 #include <sys/types.h>
 
@@ -41,4 +41,4 @@ struct HitForward
     u_int16_t y;
 };
 
-#endif // HIT_H
+#endif // PASTEC_HIT_H

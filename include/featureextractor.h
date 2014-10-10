@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef FEATUREEXTRACTOR_H
-#define FEATUREEXTRACTOR_H
+#ifndef PASTEC_FEATUREEXTRACTOR_H
+#define PASTEC_FEATUREEXTRACTOR_H
 
 #include <sys/types.h>
 
@@ -32,4 +32,4 @@ public:
                                       char *p_imgData) = 0;
 };
 
-#endif // FEATUREEXTRACTOR_H
+#endif // PASTEC_FEATUREEXTRACTOR_H

@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef IMAGELOADER_H
-#define IMAGELOADER_H
+#ifndef PASTEC_IMAGELOADER_H
+#define PASTEC_IMAGELOADER_H
 
 #include <opencv2/core/core.hpp>
 
@@ -34,4 +34,4 @@ public:
     static u_int32_t loadImage(unsigned i_imgSize, char *p_imgData, Mat &img);
 };
 
-#endif // IMAGELOADER_H
+#endif // PASTEC_IMAGELOADER_H

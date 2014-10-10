@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef SEARCHRESULT_H
-#define SEARCHRESULT_H
+#ifndef PASTEC_SEARCHRESULT_H
+#define PASTEC_SEARCHRESULT_H
 
 struct SearchResult
 {
@@ -37,4 +37,4 @@ struct SearchResult
     unsigned i_imageId;
 };
 
-#endif // SEARCHRESULT_H
+#endif // PASTEC_SEARCHRESULT_H

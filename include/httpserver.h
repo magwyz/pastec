@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef HTTPSERVER_H
-#define HTTPSERVER_H
+#ifndef PASTEC_HTTPSERVER_H
+#define PASTEC_HTTPSERVER_H
 
 #include <vector>
 #include <string>
@@ -74,4 +74,4 @@ struct ConnectionInfo
     vector<char> uploadedData;
 };
 
-#endif // HTTPSERVER_H
+#endif // PASTEC_HTTPSERVER_H

@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef ORBINDEX_H
-#define ORBINDEX_H
+#ifndef PASTEC_ORBINDEX_H
+#define PASTEC_ORBINDEX_H
 
 #include <fstream>
 #include <string>
@@ -73,4 +73,4 @@ private:
     pthread_rwlock_t rwLock;
 };
 
-#endif // ORBINDEX_H
+#endif // PASTEC_ORBINDEX_H

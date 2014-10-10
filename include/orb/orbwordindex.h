@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef ORBWORDINDEX_H
-#define ORBWORDINDEX_H
+#ifndef PASTEC_ORBWORDINDEX_H
+#define PASTEC_ORBWORDINDEX_H
 
 #include <vector>
 
@@ -46,4 +46,4 @@ private:
     cvflann::HierarchicalClusteringIndex<cvflann::Hamming<unsigned char> > *kdIndex; // The kd-tree index.
 };
 
-#endif // ORBWORDINDEX_H
+#endif // PASTEC_ORBWORDINDEX_H

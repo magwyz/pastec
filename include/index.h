@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef INDEX_H
-#define INDEX_H
+#ifndef PASTEC_INDEX_H
+#define PASTEC_INDEX_H
 
 #include <sys/types.h>
 #include <list>
@@ -41,4 +41,4 @@ public:
     virtual u_int32_t load(string backwardIndexPath) = 0;
 };
 
-#endif // INDEX_H
+#endif // PASTEC_INDEX_H

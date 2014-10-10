@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef BACKWARDINDEXREADERACCESS_H
-#define BACKWARDINDEXREADERACCESS_H
+#ifndef PASTEC_BACKWARDINDEXREADERACCESS_H
+#define PASTEC_BACKWARDINDEXREADERACCESS_H
 
 #include <sys/types.h>
 
@@ -161,4 +161,4 @@ private:
     u_int64_t i_curPos;
 };
 
-#endif // BACKWARDINDEXREADERACCESS_H
+#endif // PASTEC_BACKWARDINDEXREADERACCESS_H

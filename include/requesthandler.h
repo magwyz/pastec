@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef REQUESTHANDLER_H
-#define REQUESTHANDLER_H
+#ifndef PASTEC_REQUESTHANDLER_H
+#define PASTEC_REQUESTHANDLER_H
 
 #include <httpserver.h>
 
@@ -53,4 +53,4 @@ private:
     Index *index;
 };
 
-#endif // REQUESTHANDLER_H
+#endif // PASTEC_REQUESTHANDLER_H

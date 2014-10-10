@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef IMAGEPROCESSOR_H
-#define IMAGEPROCESSOR_H
+#ifndef PASTEC_ORBFEATUREEXTRACTOR_H
+#define PASTEC_ORBFEATUREEXTRACTOR_H
 
 #include <iostream>
 #include <fstream>
@@ -53,4 +53,4 @@ private:
     ORBWordIndex *wordIndex;
 };
 
-#endif // IMAGEPROCESSOR_H
+#endif // PASTEC_ORBFEATUREEXTRACTOR_H

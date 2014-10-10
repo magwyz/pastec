@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef SEARCHER_H
-#define SEARCHER_H
+#ifndef PASTEC_SEARCHER_H
+#define PASTEC_SEARCHER_H
 
 #include <sys/types.h>
 #include <vector>
@@ -44,4 +44,4 @@ public:
     virtual u_int32_t searchImage(SearchRequest &request) = 0;
 };
 
-#endif // SEARCHER_H
+#endif // PASTEC_SEARCHER_H

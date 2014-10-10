@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef IMAGESEARCHER_H
-#define IMAGESEARCHER_H
+#ifndef PASTEC_IMAGESEARCHER_H
+#define PASTEC_IMAGESEARCHER_H
 
 #include <queue>
 
@@ -56,4 +56,4 @@ private:
     ImageReranker reranker;
 };
 
-#endif // IMAGESEARCHER_H
+#endif // PASTEC_IMAGESEARCHER_H

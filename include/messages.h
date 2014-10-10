@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef MESSAGES_H
-#define MESSAGES_H
+#ifndef PASTEC_MESSAGES_H
+#define PASTEC_MESSAGES_H
 
 #include <sys/types.h>
 #include <string>
@@ -98,4 +98,4 @@ public:
 #define MSG_REMOVE_IMAGE_LEN 8
 
 
-#endif // MESSAGES_H
+#endif // PASTEC_MESSAGES_H

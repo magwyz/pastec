@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef THREAD_H
-#define THREAD_H
+#ifndef PASTEC_THREAD_H
+#define PASTEC_THREAD_H
 
 #include <pthread.h>
 #include <assert.h>
@@ -61,4 +61,4 @@ private:
     pthread_t thread;
 };
 
-#endif // THREAD_H
+#endif // PASTEC_THREAD_H

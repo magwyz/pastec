@@ -19,8 +19,8 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef IMAGERERANKER_H
-#define IMAGERERANKER_H
+#ifndef PASTEC_IMAGERERANKER_H
+#define PASTEC_IMAGERERANKER_H
 
 #include <sys/types.h>
 
@@ -168,4 +168,4 @@ protected:
                                      const CvMat* model, CvMat* error );
 };
 
-#endif // IMAGERERANKER_H
+#endif // PASTEC_IMAGERERANKER_H
