@@ -24,6 +24,7 @@
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/socket.h>
+#include <sys/eventfd.h>
 #include <string.h>
 
 #include "httpserver.h"
@@ -36,19 +37,13 @@
 HTTPServer::HTTPServer(RequestHandler *requestHandler, unsigned i_port)
     : daemon(NULL), requestHandler(requestHandler), i_port(i_port)
 {
-    p_cond = new pthread_cond_t();
-    p_cond_mutex = new pthread_mutex_t();
-    pthread_cond_init(p_cond, NULL);
-    pthread_mutex_init(p_cond_mutex, NULL);
+    i_eventFd = eventfd(0, 0);
 }
 
 
 HTTPServer::~HTTPServer()
 {
-    pthread_cond_destroy(p_cond);
-    pthread_mutex_destroy(p_cond_mutex);
-    delete p_cond_mutex;
-    delete p_cond;
+    close(i_eventFd);
 }
 
 
@@ -63,9 +58,9 @@ int HTTPServer::run()
 
     cout << "Ready to accept querries." << endl;
 
-    pthread_mutex_lock(p_cond_mutex);
-    pthread_cond_wait(p_cond, p_cond_mutex);
-    pthread_mutex_unlock(p_cond_mutex);
+    uint64_t i_val;
+    int i_ret = read(i_eventFd, &i_val, sizeof(i_val));
+    (void)i_ret;
 
     MHD_stop_daemon(daemon);
 
@@ -75,7 +70,9 @@ int HTTPServer::run()
 
 int HTTPServer::stop()
 {
-    pthread_cond_signal(p_cond);
+    uint64_t i_val = 1;
+    int i_ret = write(i_eventFd, &i_val, sizeof(i_val));
+    (void)i_ret;
     return OK;
 }
 

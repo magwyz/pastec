@@ -56,10 +56,9 @@ private:
 
     MHD_Daemon *daemon;
     RequestHandler *requestHandler;
-    pthread_cond_t *p_cond;
-    pthread_mutex_t *p_cond_mutex;
 
     unsigned i_port;
+    int i_eventFd;
 };
 
 
