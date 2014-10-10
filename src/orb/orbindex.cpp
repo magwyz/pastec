@@ -27,8 +27,8 @@
 #include <sys/time.h>
 #include <assert.h>
 
-#include "orbindex.h"
-#include "messages.h"
+#include <orbindex.h>
+#include <messages.h>
 
 
 ORBIndex::ORBIndex(string indexPath)

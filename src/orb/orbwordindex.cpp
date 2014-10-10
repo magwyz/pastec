@@ -22,7 +22,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "orbwordindex.h"
+#include <orbwordindex.h>
 
 
 ORBWordIndex::ORBWordIndex(string visualWordsPath)

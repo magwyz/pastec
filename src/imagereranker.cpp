@@ -25,7 +25,7 @@
 
 #include <algorithm>
 
-#include "imagereranker.h"
+#include <imagereranker.h>
 
 
 void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
@@ -89,7 +89,7 @@ void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
         const Histogram &histogram = it->second;
         unsigned i_binMax = max_element(histogram.bins, histogram.bins + HISTOGRAM_NB_BINS) - histogram.bins;
         float i_maxVal = histogram.bins[i_binMax];
-        if (i_maxVal > 15)
+        if (i_maxVal > 10)
         {
 #if 1
             RANSACTask &task = imgTasks[i_imageId];

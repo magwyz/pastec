@@ -28,9 +28,9 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "orbindex.h"
-#include "orbwordindex.h"
-#include "featureextractor.h"
+#include <orbindex.h>
+#include <orbwordindex.h>
+#include <featureextractor.h>
 
 class ClientConnection;
 

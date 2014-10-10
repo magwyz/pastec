@@ -32,9 +32,9 @@
 #include <list>
 #include <tr1/unordered_map>
 
-#include "hit.h"
-#include "backwardindexreaderaccess.h"
-#include "index.h"
+#include <hit.h>
+#include <backwardindexreaderaccess.h>
+#include <index.h>
 
 using namespace std;
 using namespace std::tr1;

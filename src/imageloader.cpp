@@ -25,8 +25,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "imageloader.h"
-#include "messages.h"
+#include <imageloader.h>
+#include <messages.h>
 
 
 u_int32_t ImageLoader::loadImage(unsigned i_imgSize, char *p_imgData, Mat &img)

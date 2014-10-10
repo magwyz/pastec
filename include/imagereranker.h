@@ -31,9 +31,9 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "thread.h"
-#include "searchResult.h"
-#include "hit.h"
+#include <thread.h>
+#include <searchResult.h>
+#include <hit.h>
 
 using namespace std;
 using namespace std::tr1;

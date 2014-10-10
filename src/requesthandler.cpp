@@ -19,17 +19,16 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include "requesthandler.h"
-#include "messages.h"
-
 #include <iostream>
 #include <stdlib.h>
 
 #include <jsoncpp/json/json.h>
 
-#include "featureextractor.h"
-#include "searcher.h"
-#include "index.h"
+#include <requesthandler.h>
+#include <messages.h>
+#include <featureextractor.h>
+#include <searcher.h>
+#include <index.h>
 
 
 RequestHandler::RequestHandler(FeatureExtractor *featureExtractor,

@@ -22,11 +22,11 @@
 #include <iostream>
 #include <signal.h>
 
-#include "httpserver.h"
-#include "requesthandler.h"
-#include "orb/orbfeatureextractor.h"
-#include "orb/orbsearcher.h"
-#include "orb/orbwordindex.h"
+#include <httpserver.h>
+#include <requesthandler.h>
+#include <orb/orbfeatureextractor.h>
+#include <orb/orbsearcher.h>
+#include <orb/orbwordindex.h>
 
 
 using namespace std;

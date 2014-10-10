@@ -42,7 +42,7 @@
 #include <opencv2/core/core_c.h>
 #include <opencv2/calib3d/calib3d.hpp>
 
-#include "imagereranker.h"
+#include <imagereranker.h>
 
 
 cv::Mat ImageReranker::findHomography( InputArray _points1, InputArray _points2,
