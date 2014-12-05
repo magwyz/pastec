@@ -115,6 +115,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     cout << i_nbTotalIndexedImages << " images indexed in the index." << endl;
 
     unordered_map<u_int32_t, vector<Hit> > indexHits; // key: visual word id, values: index hits.
+    indexHits.rehash(imageReqHits.size());
     index->getImagesWithVisualWords(imageReqHits, indexHits);
 
     gettimeofday(&t[2], NULL);
@@ -122,6 +123,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     cout << "Ranking the images." << endl;
 
     unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
+    weights.rehash(i_nbTotalIndexedImages);
 
     index->readLock();
     for (unordered_map<u_int32_t, vector<Hit> >::const_iterator it = indexHits.begin();
