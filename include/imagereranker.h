@@ -71,38 +71,6 @@ struct RANSACTask
 };
 
 
-class RANSACThread : public Thread
-{
-public:
-    RANSACThread(pthread_mutex_t *p_itMutex,
-                 map<u_int32_t, RANSACTask>::const_iterator &mIt,
-                 map<u_int32_t, RANSACTask>::const_iterator &mLastIt,
-                 pthread_mutex_t *p_resultsMutex, priority_queue<SearchResult> &rankedResultsOut)
-        : p_itMutex(p_itMutex), mIt(mIt), mLastIt(mLastIt),
-          p_resultsMutex(p_resultsMutex), rankedResultsOut(rankedResultsOut)
-    { }
-    virtual ~RANSACThread() {}
-
-    void *run();
-
-private:
-    pthread_mutex_t *p_itMutex;
-    map<u_int32_t, RANSACTask>::const_iterator &mIt;
-    map<u_int32_t, RANSACTask>::const_iterator &mLastIt;
-
-    pthread_mutex_t *p_resultsMutex;
-    priority_queue<SearchResult> &rankedResultsOut;
-};
-
-
-// A list of keypoint positions for the rerankNearestNeighbors function.
-class PointList : public Mat
-{
-public:
-    PointList() : Mat(0, 2, CV_32S) { }
-};
-
-
 #define HISTOGRAM_NB_BINS 32
 #define DIFF_MIN -360.0f / (2.0f * HISTOGRAM_NB_BINS)
 
