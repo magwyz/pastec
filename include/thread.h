@@ -28,8 +28,6 @@
 
 class Thread
 {
-    friend class ThreadManager;
-
 public:
     Thread() : b_mustStop(false) {}
     void join()
