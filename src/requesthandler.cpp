@@ -30,6 +30,9 @@
 #include <searcher.h>
 #include <index.h>
 
+#include <imageloader.h>
+#include <opencv2/highgui/highgui.hpp>
+
 
 RequestHandler::RequestHandler(FeatureExtractor *featureExtractor,
                Searcher *imageSearcher, Index *index)
@@ -147,10 +150,23 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
         ret["type"] = Converter::codeToString(i_ret);
         if (i_ret == SEARCH_RESULTS)
         {
+            // Return the image ids
             Json::Value imageIds(Json::arrayValue);
             for (unsigned i = 0; i < req.results.size(); ++i)
                 imageIds.append(req.results[i]);
             ret["image_ids"] = imageIds;
+
+            // Return the bounding rects
+            Json::Value boundingRects(Json::arrayValue);
+            for (unsigned i = 0; i < req.boundingRects.size(); ++i)
+            {
+                Rect r = req.boundingRects[i];
+                Json::Value rVal;
+                rVal["x"] = r.x; rVal["y"] = r.y;
+                rVal["width"] = r.width; rVal["height"] = r.height;
+                boundingRects.append(rVal);
+            }
+            ret["bounding_rects"] = boundingRects;
         }
     }
     else if (testURIWithPattern(parsedURI, p_ioIndex)

@@ -25,6 +25,8 @@
 
 #include <algorithm>
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 #include <imagereranker.h>
 
 
@@ -109,8 +111,11 @@ void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
                         i_nbInliners++;
 
                 if (i_nbInliners >= MIN_NB_INLINERS)
-                    rankedResultsOut.push(SearchResult(i_maxVal, i_imageId));
+                {
+                    Rect bRect = boundingRect(task.points1);
+                    rankedResultsOut.push(SearchResult(i_maxVal, i_imageId, bRect));
                     //rankedResultsOut.push(SearchResult(i_nbInliners, i_imageId));
+                }
             }
 #else
             rankedResultsOut.push(SearchResult(i_maxVal, i_imageId));

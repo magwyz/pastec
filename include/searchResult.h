@@ -22,10 +22,16 @@
 #ifndef PASTEC_SEARCHRESULT_H
 #define PASTEC_SEARCHRESULT_H
 
+#include <opencv2/core/core.hpp>
+
+using namespace cv;
+
+
 struct SearchResult
 {
-    SearchResult(float f_weight, unsigned i_imageId)
-        : f_weight(f_weight), i_imageId(i_imageId)
+    SearchResult(float f_weight, unsigned i_imageId, Rect boundingRect)
+        : f_weight(f_weight), i_imageId(i_imageId),
+          boundingRect(boundingRect)
     {}
 
     bool operator< (const SearchResult &res) const
@@ -35,6 +41,7 @@ struct SearchResult
 
     float f_weight;
     unsigned i_imageId;
+    Rect boundingRect;
 };
 
 #endif // PASTEC_SEARCHRESULT_H

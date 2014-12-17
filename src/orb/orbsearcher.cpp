@@ -208,7 +208,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     priority_queue<SearchResult> rankedResults;
     for (tr1::unordered_map<unsigned, float>::const_iterator it = weights.begin();
          it != weights.end(); ++it)
-        rankedResults.push(SearchResult(it->second, it->first));
+        rankedResults.push(SearchResult(it->second, it->first, Rect()));
 
     gettimeofday(&t[3], NULL);
     cout << "time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
@@ -259,6 +259,7 @@ void ORBSearcher::returnResults(priority_queue<SearchResult> &rankedResults,
         i_res++;
         cout << "Id: " << res.i_imageId << ", score: " << res.f_weight << endl;
         req.results.push_back(res.i_imageId);
+        req.boundingRects.push_back(res.boundingRect);
         rankedResults.pop();
     }
 }

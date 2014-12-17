@@ -25,7 +25,11 @@
 #include <sys/types.h>
 #include <vector>
 
+#include <opencv2/core/core.hpp>
+
+
 using namespace std;
+using namespace cv;
 
 class ClientConnection;
 
@@ -35,6 +39,7 @@ struct SearchRequest
     vector<char> imageData;
     ClientConnection *client;
     vector<u_int32_t> results;
+    vector<Rect> boundingRects;
 };
 
 
