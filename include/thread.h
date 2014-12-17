@@ -30,6 +30,7 @@ class Thread
 {
 public:
     Thread() : b_mustStop(false) {}
+    virtual ~Thread() {}
     void join()
     {
         void *res;
