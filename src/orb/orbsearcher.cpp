@@ -46,6 +46,11 @@ ORBSearcher::~ORBSearcher()
 { }
 
 
+/**
+ * @brief The RankingThread class
+ * This threads computes the tf-idf weights of the images that contains the words
+ * given in argument.
+ */
 class RankingThread : public Thread
 {
 public:
