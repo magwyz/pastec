@@ -58,7 +58,10 @@ private:
     RequestHandler *requestHandler;
 
     unsigned i_port;
-    int i_eventFd;
+
+    pthread_cond_t stopCond;
+    pthread_mutex_t stopMutex;
+    bool b_stop;
 };
 
 

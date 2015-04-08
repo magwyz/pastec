@@ -24,7 +24,6 @@
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-#include <sys/eventfd.h>
 #include <string.h>
 
 #include <httpserver.h>
@@ -35,15 +34,18 @@
 
 
 HTTPServer::HTTPServer(RequestHandler *requestHandler, unsigned i_port)
-    : daemon(NULL), requestHandler(requestHandler), i_port(i_port)
+    : daemon(NULL), requestHandler(requestHandler), i_port(i_port),
+      b_stop(false)
 {
-    i_eventFd = eventfd(0, 0);
+    pthread_mutex_init(&stopMutex, NULL);
+    pthread_cond_init(&stopCond, NULL);
 }
 
 
 HTTPServer::~HTTPServer()
 {
-    close(i_eventFd);
+    pthread_cond_destroy(&stopCond);
+    pthread_mutex_destroy(&stopMutex);
 }
 
 
@@ -58,9 +60,10 @@ int HTTPServer::run()
 
     cout << "Ready to accept querries." << endl;
 
-    uint64_t i_val;
-    int i_ret = read(i_eventFd, &i_val, sizeof(i_val));
-    (void)i_ret;
+    pthread_mutex_lock(&stopMutex);
+    while (!b_stop)
+        pthread_cond_wait(&stopCond, &stopMutex);
+    pthread_mutex_unlock(&stopMutex);
 
     MHD_stop_daemon(daemon);
 
@@ -71,8 +74,10 @@ int HTTPServer::run()
 int HTTPServer::stop()
 {
     uint64_t i_val = 1;
-    int i_ret = write(i_eventFd, &i_val, sizeof(i_val));
-    (void)i_ret;
+    pthread_mutex_lock(&stopMutex);
+    b_stop = true;
+    pthread_cond_signal(&stopCond);
+    pthread_mutex_unlock(&stopMutex);
     return OK;
 }
 
