@@ -238,7 +238,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
  */
 string RequestHandler::JsonToString(Json::Value data)
 {
-    Json::StyledWriter writer;
+    Json::FastWriter writer;
     return writer.write(data);
 }
 
