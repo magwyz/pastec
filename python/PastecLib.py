@@ -80,7 +80,6 @@ class PastecConnection:
     def imageQueryData(self, imageData):
         ret = self.request("index/searcher", "POST", imageData)
         self.raiseExceptionIfNeeded(ret["type"])
-        print(ret)
         imageIds = ret["image_ids"]
         return imageIds
 
