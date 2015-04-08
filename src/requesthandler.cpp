@@ -113,6 +113,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     string p_image[] = {"index", "images", "IDENTIFIER", ""};
     string p_searchImage[] = {"index", "searcher", ""};
     string p_ioIndex[] = {"index", "io", ""};
+    string p_imageIds[] = {"index", "imageIds", ""};
     string p_root[] = {""};
 
     Json::Value ret;
@@ -187,6 +188,20 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
             i_ret = MISFORMATTED_REQUEST;
 
         ret["type"] = Converter::codeToString(i_ret);
+    }
+    else if (testURIWithPattern(parsedURI, p_imageIds)
+             && conInfo.connectionType == GET)
+    {
+        vector<u_int32_t> imageIds;
+        u_int32_t i_ret = index->getImageIds(imageIds);
+
+        ret["type"] = Converter::codeToString(i_ret);
+
+        // Return the image ids
+        Json::Value imageIdsVal(Json::arrayValue);
+        for (unsigned i = 0; i < imageIds.size(); ++i)
+            imageIdsVal.append(imageIds[i]);
+        ret["image_ids"] = imageIdsVal;
     }
     else if (testURIWithPattern(parsedURI, p_root)
              && conInfo.connectionType == POST)

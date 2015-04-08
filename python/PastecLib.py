@@ -74,6 +74,12 @@ class PastecConnection:
         ret = self.request("index/io", "POST", bytearray(s, "UTF-8"))
         self.raiseExceptionIfNeeded(ret["type"])
 
+    def getIndexImageIds(self):
+        ret = self.request("index/imageIds", "GET", bytearray(s, "UTF-8"))
+        self.raiseExceptionIfNeeded(ret["type"])
+        imageIds = ret["image_ids"]
+        return imageIds
+
     def imageQueryFile(self, filePath):
         return self.imageQueryData(self.loadFileData(filePath))
 

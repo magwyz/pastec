@@ -39,6 +39,7 @@ public:
     virtual u_int32_t write(string backwardIndexPath) = 0;
     virtual u_int32_t clear() = 0;
     virtual u_int32_t load(string backwardIndexPath) = 0;
+    virtual u_int32_t getImageIds(vector<u_int32_t> &imageIds) = 0;
 };
 
 #endif // PASTEC_INDEX_H

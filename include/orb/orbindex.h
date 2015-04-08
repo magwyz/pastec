@@ -58,6 +58,7 @@ public:
     u_int32_t write(string backwardIndexPath);
     u_int32_t clear();
     u_int32_t load(string backwardIndexPath);
+    u_int32_t getImageIds(vector<u_int32_t> &imageIds);
     void readLock();
     void unlock();
 

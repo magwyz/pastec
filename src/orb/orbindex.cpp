@@ -357,6 +357,22 @@ u_int32_t ORBIndex::load(string backwardIndexPath)
 
 
 /**
+ * @brief List the images ids in the index.
+ * @param imageIds the vector to return the images ids.
+ * @return the operation code.
+ */
+u_int32_t ORBIndex::getImageIds(vector<u_int32_t> &imageIds)
+{
+    imageIds.reserve(nbWords.size());
+    for (unordered_map<u_int64_t, unsigned>::const_iterator it = nbWords.begin();
+         it != nbWords.end(); ++it)
+        imageIds.push_back(it->first);
+
+    return INDEX_IMAGE_IDS;
+}
+
+
+/**
  * @brief Lock for reading the index.
  */
 void ORBIndex::readLock()
