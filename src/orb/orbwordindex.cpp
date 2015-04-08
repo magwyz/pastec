@@ -58,7 +58,7 @@ void ORBWordIndex::knnSearch(const Mat& query, vector<int>& indices,
     m_indices.init(indices.data(), dists.data());
 
     kdIndex->findNeighbors(m_indices, (unsigned char*)query.ptr<unsigned char>(0),
-                           cvflann::SearchParams(1));
+                           cvflann::SearchParams(8));
 }
 
 
