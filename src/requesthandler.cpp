@@ -124,11 +124,14 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     {
         u_int32_t i_imageId = atoi(parsedURI[2].c_str());
 
+        unsigned i_nbFeaturesExtracted;
         u_int32_t i_ret = featureExtractor->processNewImage(
-            i_imageId, conInfo.uploadedData.size(), conInfo.uploadedData.data());
+            i_imageId, conInfo.uploadedData.size(), conInfo.uploadedData.data(),
+            i_nbFeaturesExtracted);
 
         ret["type"] = Converter::codeToString(i_ret);
         ret["image_id"] = Json::Value(i_imageId);
+        ret["nb_features_extracted"] = Json::Value(i_nbFeaturesExtracted);
     }
     else if (testURIWithPattern(parsedURI, p_image)
              && conInfo.connectionType == DELETE)
