@@ -168,6 +168,12 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
                 boundingRects.append(rVal);
             }
             ret["bounding_rects"] = boundingRects;
+
+            // Return the scores
+            Json::Value scores(Json::arrayValue);
+            for (unsigned i = 0; i < req.scores.size(); ++i)
+                scores.append(req.scores[i]);
+            ret["scores"] = scores;
         }
     }
     else if (testURIWithPattern(parsedURI, p_ioIndex)

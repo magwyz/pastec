@@ -27,7 +27,6 @@
 
 #include <opencv2/core/core.hpp>
 
-
 using namespace std;
 using namespace cv;
 
@@ -40,6 +39,7 @@ struct SearchRequest
     ClientConnection *client;
     vector<u_int32_t> results;
     vector<Rect> boundingRects;
+    vector<float> scores;
 };
 
 

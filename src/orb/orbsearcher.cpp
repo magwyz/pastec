@@ -265,6 +265,7 @@ void ORBSearcher::returnResults(priority_queue<SearchResult> &rankedResults,
         cout << "Id: " << res.i_imageId << ", score: " << res.f_weight << endl;
         req.results.push_back(res.i_imageId);
         req.boundingRects.push_back(res.boundingRect);
+        req.scores.push_back(res.f_weight);
         rankedResults.pop();
     }
 }
