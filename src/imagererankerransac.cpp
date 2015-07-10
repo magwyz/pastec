@@ -228,10 +228,7 @@ cv::Mat RANSACThread::pastecEstimateRigidTransform(InputArray src1, InputArray s
             }
 
             if( k1 >= RANSAC_MAX_ITERS )
-            {
-                cout << "k1 >= RANSAC_MAX_ITERS" << endl;
                 break;
-            }
         }
 
         if( i < RANSAC_SIZE0 )
