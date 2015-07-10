@@ -192,11 +192,11 @@ cv::Mat RANSACThread::pastecEstimateRigidTransform(InputArray src1, InputArray s
                     // check that the points are not very close one each other
                     float u = pA[idx[i]].x - pA[idx[j]].x;
                     float v = pA[idx[i]].y - pA[idx[j]].y;
-                    if( u * u + v * v < 3 * 3 )
+                    if( u * u + v * v < 20 * 20 )
                         break;
                     u = pB[idx[i]].x - pB[idx[j]].x;
                     v = pB[idx[i]].y - pB[idx[j]].y;
-                    if( u * u + v * v < 3 * 3 )
+                    if( u * u + v * v < 20 * 20 )
                         break;
                 }
 
@@ -218,7 +218,7 @@ cv::Mat RANSACThread::pastecEstimateRigidTransform(InputArray src1, InputArray s
                     double dax2 = a[2].x - a[0].x, day2 = a[2].y - a[0].y;
                     double dbx1 = b[1].x - b[0].x, dby1 = b[1].y - b[0].y;
                     double dbx2 = b[2].x - b[0].x, dby2 = b[2].y - b[0].y;
-                    const double eps = 0.01;
+                    const double eps = 0.2;
 
                     if( fabs(dax1*day2 - day1*dax2) < eps*std::sqrt(dax1*dax1+day1*day1)*std::sqrt(dax2*dax2+day2*day2) ||
                         fabs(dbx1*dby2 - dby1*dbx2) < eps*std::sqrt(dbx1*dbx1+dby1*dby1)*std::sqrt(dbx2*dbx2+dby2*dby2) )
