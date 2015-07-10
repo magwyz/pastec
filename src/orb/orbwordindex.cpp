@@ -38,7 +38,7 @@ ORBWordIndex::ORBWordIndex(string visualWordsPath)
     cvflann::Matrix<unsigned char> m_features
             ((unsigned char*)words->ptr<unsigned char>(0), words->rows, words->cols);
     kdIndex = new cvflann::HierarchicalClusteringIndex<cvflann::Hamming<unsigned char> >
-            (m_features,cvflann::HierarchicalClusteringIndexParams(10));
+            (m_features,cvflann::HierarchicalClusteringIndexParams(10, cvflann::FLANN_CENTERS_RANDOM, 8, 100));
     kdIndex->buildIndex();
 }
 
@@ -58,7 +58,7 @@ void ORBWordIndex::knnSearch(const Mat& query, vector<int>& indices,
     m_indices.init(indices.data(), dists.data());
 
     kdIndex->findNeighbors(m_indices, (unsigned char*)query.ptr<unsigned char>(0),
-                           cvflann::SearchParams(1000));
+                           cvflann::SearchParams(2000));
 }
 
 
