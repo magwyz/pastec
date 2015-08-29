@@ -96,6 +96,9 @@ bool RequestHandler::testURIWithPattern(vector<string> parsedURI, string p_patte
             return false;
     }
 
+    if (i != parsedURI.size())
+        return false;
+
     return true;
 }
 
