@@ -33,90 +33,36 @@
 #include <imagereranker.h>
 
 
-class RANSACThread : public Thread
+void *RANSACThread::run()
 {
-public:
-    RANSACThread(pthread_mutex_t &mutex,
-                 unordered_map<u_int32_t, RANSACTask> &imgTasks,
-                 priority_queue<SearchResult> &rankedResultsOut)
-        : mutex(mutex), imgTasks(imgTasks), rankedResultsOut(rankedResultsOut)
-    { }
-
-public:
-    void *run()
+    for (unsigned i = 0; i < imageIds.size(); ++i)
     {
-        for (unsigned i = 0; i < imageIds.size(); ++i)
+        const unsigned i_imageId = imageIds[i];
+        const Histogram histogram = histograms[i];
+        unsigned i_binMax = max_element(histogram.bins, histogram.bins + HISTOGRAM_NB_BINS) - histogram.bins;
+        float i_maxVal = histogram.bins[i_binMax];
+        if (i_maxVal > 10)
         {
-            const unsigned i_imageId = imageIds[i];
-            const Histogram histogram = histograms[i];
-            unsigned i_binMax = max_element(histogram.bins, histogram.bins + HISTOGRAM_NB_BINS) - histogram.bins;
-            float i_maxVal = histogram.bins[i_binMax];
-            if (i_maxVal > 10)
+            RANSACTask &task = imgTasks[i_imageId];
+            assert(task.points1.size() == task.points2.size());
+
+            if (task.points1.size() >= 12)
             {
-                RANSACTask &task = imgTasks[i_imageId];
-                assert(task.points1.size() == task.points2.size());
+                Mat mask;
+                Mat H = pastecEstimateRigidTransform(task.points2, task.points1, true);
 
-                #define MIN_NB_INLINERS 4
+                if (countNonZero(H) == 0)
+                    continue;
 
-                if (task.points1.size() >= MIN_NB_INLINERS)
-                {
-                    Mat mask;
-                    Mat H = ImageReranker::findHomography(task.points2, task.points1, CV_RANSAC, 3, mask);
+                Rect bRect1 = boundingRect(task.points1);
 
-                    // Count the number of inliners.
-                    unsigned i_nbInliners = 0;
-                    for (unsigned i = 0; i < task.points1.size(); ++i)
-                        if (mask.at<uchar>(0, i) == 1)
-                            i_nbInliners++;
-
-                    if (i_nbInliners >= MIN_NB_INLINERS)
-                    {
-                        Rect bRect1 = boundingRect(task.points1);
-                        Rect bRect2 = boundingRect(task.points2);
-
-                        vector<cv::Point2f> points2(4);
-                        points2[0] = Point2f(bRect2.x, bRect2.y);
-                        points2[1] = Point2f(bRect2.x + bRect2.width, bRect2.y);
-                        points2[2] = Point2f(bRect2.x + bRect2.width, bRect2.y + bRect2.height);
-                        points2[3] = Point2f(bRect2.x, bRect2.y + bRect2.height);
-
-                        vector<cv::Point2f> points1(4);
-                        perspectiveTransform(points2, points1, H);
-
-                        bool b_add = true;
-                        for (unsigned i = 0; i < 4; ++i)
-                        {
-                            Point2f v1 = points1[(i + 2) % 4] - points1[(i + 1) % 4];
-                            Point2f v2 = points1[i] - points1[(i + 1) % 4];
-
-                            float angle = atan2(v1.x * v2.y - v1.y * v2.x, v1.x * v2.x + v1.y * v2.y);
-                            if (angle < 0 || angle > 3 * M_PI / 4 || norm(v1) < 30)
-                            {
-                                b_add = false;
-                                break;
-                            }
-                        }
-
-                        if (b_add)
-                        {
-                            pthread_mutex_lock(&mutex);
-                            rankedResultsOut.push(SearchResult(i_maxVal, i_imageId, bRect1));
-                            pthread_mutex_unlock(&mutex);
-                        }
-                    }
-                }
+                pthread_mutex_lock(&mutex);
+                rankedResultsOut.push(SearchResult(i_maxVal, i_imageId, bRect1));
+                pthread_mutex_unlock(&mutex);
             }
         }
     }
-
-    pthread_mutex_t &mutex;
-    unordered_map<u_int32_t, RANSACTask> &imgTasks;
-    priority_queue<SearchResult> &rankedResultsOut;
-
-public:
-    deque<unsigned> imageIds;
-    deque<Histogram> histograms;
-};
+}
 
 
 void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
