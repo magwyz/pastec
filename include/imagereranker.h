@@ -49,15 +49,15 @@ public:
                 priority_queue<SearchResult> &rankedResultsIn,
                 priority_queue<SearchResult> &rankedResultsOut,
                 unsigned i_nbResults);
+    static cv::Mat findHomography(InputArray _points1, InputArray _points2,
+                            int method, double ransacReprojThreshold,
+                            OutputArray _mask);
 
 private:
     float angleDiff(unsigned i_angle1, unsigned i_angle2);
     void getFirstImageIds(priority_queue<SearchResult> &rankedResultsIn,
                           unsigned i_nbResults, unordered_set<u_int32_t> &firstImageIds);
-    cv::Mat findHomography(InputArray _points1, InputArray _points2,
-                            int method, double ransacReprojThreshold,
-                            OutputArray _mask);
-    int cvFindHomography(const CvMat* objectPoints, const CvMat* imagePoints,
+    static int cvFindHomography(const CvMat* objectPoints, const CvMat* imagePoints,
                          CvMat* __H, int method, double ransacReprojThreshold,
                          CvMat* mask);
 };

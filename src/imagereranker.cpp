@@ -61,7 +61,7 @@ public:
                 if (task.points1.size() >= MIN_NB_INLINERS)
                 {
                     Mat mask;
-                    Mat H = findHomography(task.points2, task.points1, CV_RANSAC, 3, mask);
+                    Mat H = ImageReranker::findHomography(task.points2, task.points1, CV_RANSAC, 3, mask);
 
                     // Count the number of inliners.
                     unsigned i_nbInliners = 0;
