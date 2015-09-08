@@ -76,7 +76,8 @@ vector<string> RequestHandler::parseURI(string uri)
  */
 bool RequestHandler::testURIWithPattern(vector<string> parsedURI, string p_pattern[])
 {
-    for (unsigned i = 0; ; ++i)
+    unsigned i = 0;
+    for (;; ++i)
     {
         if (p_pattern[i] == "")
             break;
