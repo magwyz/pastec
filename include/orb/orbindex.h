@@ -30,14 +30,20 @@
 #include <map>
 #include <vector>
 #include <list>
+#ifndef __APPLE__
 #include <tr1/unordered_map>
+#else
+#include <unordered_map>
+#endif
 
 #include <hit.h>
 #include <backwardindexreaderaccess.h>
 #include <index.h>
 
 using namespace std;
+#ifndef __APPLE__
 using namespace std::tr1;
+#endif
 
 
 #define NB_VISUAL_WORDS 1000000

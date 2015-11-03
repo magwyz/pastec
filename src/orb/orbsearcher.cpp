@@ -24,8 +24,13 @@
 #include <sys/time.h>
 
 #include <set>
+#ifndef __APPLE__
 #include <tr1/unordered_set>
 #include <tr1/unordered_map>
+#else
+#include <unordered_set>
+#include <unordered_map>
+#endif
 #include <queue>
 
 #include <opencv2/highgui/highgui.hpp>
@@ -36,6 +41,9 @@
 #include <messages.h>
 #include <imageloader.h>
 
+#ifndef __APPLE__
+using namespace std::tr1;
+#endif
 
 ORBSearcher::ORBSearcher(ORBIndex *index, ORBWordIndex *wordIndex)
     : index(index), wordIndex(wordIndex)
@@ -211,7 +219,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     index->unlock();
 
     priority_queue<SearchResult> rankedResults;
-    for (tr1::unordered_map<unsigned, float>::const_iterator it = weights.begin();
+    for (unordered_map<unsigned, float>::const_iterator it = weights.begin();
          it != weights.end(); ++it)
         rankedResults.push(SearchResult(it->second, it->first, Rect()));
 
