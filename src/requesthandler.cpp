@@ -50,7 +50,7 @@ vector<string> RequestHandler::parseURI(string uri)
 {
     vector<string> ret;
 
-    if (uri[0] != '/')
+    if (uri == "/" || uri[0] != '/')
         return ret;
 
     size_t pos1 = 1;
@@ -81,7 +81,9 @@ bool RequestHandler::testURIWithPattern(vector<string> parsedURI, string p_patte
     {
         if (p_pattern[i] == "")
             break;
-        else if (p_pattern[i] == "IDENTIFIER")
+        if (i >= parsedURI.size())
+            return false;
+        if (p_pattern[i] == "IDENTIFIER")
         {
             // Test we have a number here.
             if (parsedURI[i].length() == 0)
