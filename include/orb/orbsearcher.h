@@ -45,6 +45,7 @@ public:
     ORBSearcher(ORBIndex *index, ORBWordIndex *wordIndex);
     virtual ~ORBSearcher();
     u_int32_t searchImage(SearchRequest &request);
+    u_int32_t searchSimilar(SearchRequest &request);
 
 private:
     void returnResults(priority_queue<SearchResult> &rankedResults,

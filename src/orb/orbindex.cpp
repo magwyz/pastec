@@ -188,6 +188,56 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
 
 
 /**
+ * @brief Get a list of hits associated with an image id.
+ * @param  the list of hits.
+ */
+u_int32_t ORBIndex::getImageWords(unsigned i_imageId, unordered_map<u_int32_t, list<Hit> > &hitList)
+{
+    pthread_rwlock_wrlock(&rwLock);
+
+    const unsigned i_nbTotalIndexedImages = getTotalNbIndexedImages();
+    const unsigned i_maxNbOccurences = i_nbTotalIndexedImages > 10000 ?
+                                       0.15 * i_nbTotalIndexedImages
+                                       : i_nbTotalIndexedImages;
+
+    unordered_map<u_int64_t, unsigned>::iterator imgIt =
+        nbWords.find(i_imageId);
+
+    if (imgIt == nbWords.end())
+    {
+        cout << "Image " << i_imageId << " not found." << endl;
+        pthread_rwlock_unlock(&rwLock);
+        return IMAGE_NOT_FOUND;
+    }
+
+    for (unsigned i_wordId = 0; i_wordId < NB_VISUAL_WORDS; ++i_wordId)
+    {
+        vector<Hit> &hits = indexHits[i_wordId];
+        vector<Hit>::iterator it = hits.begin();
+
+        while (it != hits.end())
+        {
+            if (it->i_imageId == i_imageId)
+            {
+                if (getWordNbOccurences(i_wordId) <= i_maxNbOccurences)
+                {
+                    //cout << "Matching word " << i_wordId << " found." << endl;
+                    hitList[i_wordId].push_back(*it);
+                }
+                break;
+            }
+            ++it;
+        }
+    }
+    pthread_rwlock_unlock(&rwLock);
+
+    cout << "Image " << i_imageId << " found with " << hitList.size() << " words." << endl;
+
+    return OK;
+}
+
+
+/**
  * @brief Read the index and store it in memory.
  * @return true on success else false
  */

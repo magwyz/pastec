@@ -61,6 +61,7 @@ public:
     unsigned getTotalNbIndexedImages();
     u_int32_t addImage(unsigned i_imageId, list<HitForward> hitList);
     u_int32_t removeImage(const unsigned i_imageId);
+    u_int32_t getImageWords(const unsigned i_imageId, unordered_map<u_int32_t, list<Hit> > &hitList);
     u_int32_t write(string backwardIndexPath);
     u_int32_t clear();
     u_int32_t load(string backwardIndexPath);
