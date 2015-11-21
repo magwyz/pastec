@@ -202,7 +202,7 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
 u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
         unordered_map<u_int32_t, list<Hit> > imageReqHits)
 {
-    timeval t[4];
+    timeval t[7];
     gettimeofday(&t[0], NULL);
 
     const unsigned i_nbTotalIndexedImages = index->getTotalNbIndexedImages();
@@ -235,11 +235,17 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
             threads[i]->addWord(it->first);
     }
 
+    gettimeofday(&t[2], NULL);
+    cout << "init threads time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
+
     // Compute
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
         threads[i]->start();
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
         threads[i]->join();
+
+    gettimeofday(&t[3], NULL);
+    cout << "compute time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
 
     // Reduce...
     unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
@@ -248,6 +254,9 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
         for (unordered_map<u_int32_t, float>::const_iterator it = threads[i]->weights.begin();
             it != threads[i]->weights.end(); ++it)
             weights[it->first] += it->second;
+
+    gettimeofday(&t[4], NULL);
+    cout << "reduce time: " << getTimeDiff(t[3], t[4]) << " ms." << endl;
 
     // Free the memory
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
@@ -259,20 +268,20 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     for (unordered_map<unsigned, float>::const_iterator it = weights.begin();
          it != weights.end(); ++it)
     {
-        cout << "Second: " << it->second << " First: " << it->first << endl;
+        //cout << "Second: " << it->second << " First: " << it->first << endl;
         rankedResults.push(SearchResult(it->second, it->first, Rect()));
     }
 
-    gettimeofday(&t[2], NULL);
-    cout << "time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
+    gettimeofday(&t[5], NULL);
+    cout << "rankedResult time: " << getTimeDiff(t[4], t[5]) << " ms." << endl;
     cout << "Reranking 300 among " << rankedResults.size() << " images." << endl;
 
     priority_queue<SearchResult> rerankedResults;
     reranker.rerank(imageReqHits, indexHits,
                     rankedResults, rerankedResults, 300);
 
-    gettimeofday(&t[3], NULL);
-    cout << "time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
+    gettimeofday(&t[6], NULL);
+    cout << "time: " << getTimeDiff(t[5], t[6]) << " ms." << endl;
     cout << "Returning the results. " << endl;
 
     returnResults(rerankedResults, request, 100);
