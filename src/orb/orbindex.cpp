@@ -127,6 +127,7 @@ u_int32_t ORBIndex::addImage(unsigned i_imageId, list<HitForward> hitList)
         hitBack.x = hitFor.x;
         hitBack.y = hitFor.y;
 
+        imageWords[hitFor.i_imageId].push_back(hitFor.i_wordId);
         indexHits[hitFor.i_wordId].push_back(hitBack);
         nbWords[hitFor.i_imageId]++;
         nbOccurences[hitFor.i_wordId]++;
@@ -152,8 +153,10 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
     pthread_rwlock_wrlock(&rwLock);
     unordered_map<u_int64_t, unsigned>::iterator imgIt =
         nbWords.find(i_imageId);
+    unordered_map<u_int64_t, vector<unsigned> >::iterator imageWordsIt =
+        imageWords.find(i_imageId);
 
-    if (imgIt == nbWords.end())
+    if (imgIt == nbWords.end() || imageWordsIt == imageWords.end())
     {
         cout << "Image " << i_imageId << " not found." << endl;
         pthread_rwlock_unlock(&rwLock);
@@ -161,6 +164,7 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
     }
 
     nbWords.erase(imgIt);
+    imageWords.erase(imageWordsIt);
 
     for (unsigned i_wordId = 0; i_wordId < NB_VISUAL_WORDS; ++i_wordId)
     {
@@ -200,35 +204,41 @@ u_int32_t ORBIndex::getImageWords(unsigned i_imageId, unordered_map<u_int32_t, l
                                        0.15 * i_nbTotalIndexedImages
                                        : i_nbTotalIndexedImages;
 
-    unordered_map<u_int64_t, unsigned>::iterator imgIt =
-        nbWords.find(i_imageId);
+    unordered_map<u_int64_t, vector<unsigned> >::iterator imgIt =
+        imageWords.find(i_imageId);
 
-    if (imgIt == nbWords.end())
+    if (imgIt == imageWords.end())
     {
         cout << "Image " << i_imageId << " not found." << endl;
         pthread_rwlock_unlock(&rwLock);
         return IMAGE_NOT_FOUND;
     }
 
-    for (unsigned i_wordId = 0; i_wordId < NB_VISUAL_WORDS; ++i_wordId)
-    {
-        vector<Hit> &hits = indexHits[i_wordId];
-        vector<Hit>::iterator it = hits.begin();
+    vector<unsigned> &words = imageWords[i_imageId];
+    vector<unsigned>::iterator word_it = words.begin();
 
-        while (it != hits.end())
+    while (word_it != words.end())
+    {
+        unsigned i_wordId = *word_it;
+
+        if (getWordNbOccurences(i_wordId) <= i_maxNbOccurences)
         {
-            if (it->i_imageId == i_imageId)
+            vector<Hit> &hits = indexHits[i_wordId];
+            vector<Hit>::iterator hit_it = hits.begin();
+
+            while (hit_it != hits.end())
             {
-                if (getWordNbOccurences(i_wordId) <= i_maxNbOccurences)
+                if (hit_it->i_imageId == i_imageId)
                 {
-                    //cout << "Matching word " << i_wordId << " found." << endl;
-                    hitList[i_wordId].push_back(*it);
+                    hitList[i_wordId].push_back(*hit_it);
+                    break;
                 }
-                break;
+                ++hit_it;
             }
-            ++it;
         }
+        ++word_it;
     }
+
     pthread_rwlock_unlock(&rwLock);
 
     cout << "Image " << i_imageId << " found with " << hitList.size() << " words." << endl;
@@ -306,6 +316,7 @@ bool ORBIndex::readIndex(string backwardIndexPath)
                 hits[i].i_angle = i_angle;
                 hits[i].x = x;
                 hits[i].y = y;
+                imageWords[i_imageId].push_back(i_wordId);
             }
         }
 
@@ -383,6 +394,7 @@ u_int32_t ORBIndex::clear()
     }
 
     nbWords.clear();
+    imageWords.clear();
     totalNbRecords = 0;
     pthread_rwlock_unlock(&rwLock);
 

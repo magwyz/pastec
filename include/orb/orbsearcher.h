@@ -51,6 +51,8 @@ private:
     void returnResults(priority_queue<SearchResult> &rankedResults,
                        SearchRequest &req, unsigned i_maxNbResults);
     unsigned long getTimeDiff(const timeval t1, const timeval t2) const;
+    u_int32_t processSimilar(SearchRequest &request,
+                             unordered_map<u_int32_t, list<Hit> > imageReqHits);
 
     ORBIndex *index;
     ORBWordIndex *wordIndex;

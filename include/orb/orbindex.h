@@ -76,6 +76,7 @@ private:
     u_int64_t totalNbRecords;
 
     unordered_map<u_int64_t, unsigned> nbWords;
+    unordered_map<u_int64_t, vector<unsigned> > imageWords;
     vector<Hit> indexHits[NB_VISUAL_WORDS];
 
     pthread_rwlock_t rwLock;

@@ -110,7 +110,7 @@ public:
  */
 u_int32_t ORBSearcher::searchImage(SearchRequest &request)
 {
-    timeval t[5];
+    timeval t[3];
     gettimeofday(&t[0], NULL);
 
     cout << "Loading the image and extracting the ORBs." << endl;
@@ -120,8 +120,6 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
                                              request.imageData.data(), img);
     if (i_ret != OK)
         return i_ret;
-
-    //equalizeHist( img, img );
 
     vector<KeyPoint> keypoints;
     Mat descriptors;
@@ -169,86 +167,10 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
         }
     }
 
-    cout << imageReqHits.size() << " visual words kept for the request." << endl;
-
-    cout << i_nbTotalIndexedImages << " images indexed in the index." << endl;
-
-    unordered_map<u_int32_t, vector<Hit> > indexHits; // key: visual word id, values: index hits.
-    indexHits.rehash(imageReqHits.size());
-    index->getImagesWithVisualWords(imageReqHits, indexHits);
-
     gettimeofday(&t[2], NULL);
     cout << "time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
-    cout << "Ranking the images." << endl;
 
-    index->readLock();
-    #define NB_RANKING_THREAD 4
-
-    // Map the ranking to threads.
-    unsigned i_wordsPerThread = indexHits.size() / NB_RANKING_THREAD + 1;
-    RankingThread *threads[NB_RANKING_THREAD];
-
-    unordered_map<u_int32_t, vector<Hit> >::const_iterator it = indexHits.begin();
-    for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
-    {
-        threads[i] = new RankingThread(index, i_nbTotalIndexedImages, indexHits);
-
-        unsigned i_nbWords = 0;
-        for (; it != indexHits.end() && i_nbWords < i_wordsPerThread; ++it, ++i_nbWords)
-            threads[i]->addWord(it->first);
-    }
-
-    // Compute
-    for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
-        threads[i]->start();
-    for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
-        threads[i]->join();
-
-    // Reduce...
-    unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
-    weights.rehash(i_nbTotalIndexedImages);
-    for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
-        for (unordered_map<u_int32_t, float>::const_iterator it = threads[i]->weights.begin();
-            it != threads[i]->weights.end(); ++it)
-            weights[it->first] += it->second;
-
-    // Free the memory
-    for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
-        delete threads[i];
-
-    index->unlock();
-
-    priority_queue<SearchResult> rankedResults;
-    for (unordered_map<unsigned, float>::const_iterator it = weights.begin();
-         it != weights.end(); ++it)
-        rankedResults.push(SearchResult(it->second, it->first, Rect()));
-
-    gettimeofday(&t[3], NULL);
-    cout << "time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
-    cout << "Reranking 300 among " << rankedResults.size() << " images." << endl;
-
-    priority_queue<SearchResult> rerankedResults;
-    reranker.rerank(imageReqHits, indexHits,
-                    rankedResults, rerankedResults, 300);
-
-    gettimeofday(&t[4], NULL);
-    cout << "time: " << getTimeDiff(t[3], t[4]) << " ms." << endl;
-    cout << "Returning the results. " << endl;
-
-    returnResults(rerankedResults, request, 100);
-
-#if 0
-    // Draw keypoints and ellipses.
-    Mat img_res;
-    drawKeypoints(img, cleanKeypoints, img_res, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
-    for (unsigned i = 0; i < ellipses.size(); ++i)
-        ellipse( img_res, ellipses[i], Scalar(0, 0, 255), 1);
-
-    // Show the image.
-    imshow("Keypoints 1", img_res);
-#endif
-
-    return SEARCH_RESULTS;
+    return processSimilar(request, imageReqHits);
 }
 
 
@@ -258,10 +180,8 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
  */
 u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
 {
-    timeval t[5];
+    timeval t[2];
     gettimeofday(&t[0], NULL);
-
-    const unsigned i_nbTotalIndexedImages = index->getTotalNbIndexedImages();
 
     cout << "Loading the image words from the index." << endl;
 
@@ -273,8 +193,20 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
         return i_ret;
 
     gettimeofday(&t[1], NULL);
-
     cout << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
+
+    return processSimilar(request, imageReqHits);
+}
+
+
+u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
+        unordered_map<u_int32_t, list<Hit> > imageReqHits)
+{
+    timeval t[4];
+    gettimeofday(&t[0], NULL);
+
+    const unsigned i_nbTotalIndexedImages = index->getTotalNbIndexedImages();
+
     cout << imageReqHits.size() << " visual words kept for the request." << endl;
     cout << i_nbTotalIndexedImages << " images indexed in the index." << endl;
 
@@ -282,8 +214,8 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
     indexHits.rehash(imageReqHits.size());
     index->getImagesWithVisualWords(imageReqHits, indexHits);
 
-    gettimeofday(&t[2], NULL);
-    cout << "time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
+    gettimeofday(&t[1], NULL);
+    cout << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
     cout << "Ranking the images." << endl;
 
     index->readLock();
@@ -326,18 +258,21 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
     priority_queue<SearchResult> rankedResults;
     for (unordered_map<unsigned, float>::const_iterator it = weights.begin();
          it != weights.end(); ++it)
+    {
+        cout << "Second: " << it->second << " First: " << it->first << endl;
         rankedResults.push(SearchResult(it->second, it->first, Rect()));
+    }
 
-    gettimeofday(&t[3], NULL);
-    cout << "time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
+    gettimeofday(&t[2], NULL);
+    cout << "time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
     cout << "Reranking 300 among " << rankedResults.size() << " images." << endl;
 
     priority_queue<SearchResult> rerankedResults;
     reranker.rerank(imageReqHits, indexHits,
                     rankedResults, rerankedResults, 300);
 
-    gettimeofday(&t[4], NULL);
-    cout << "time: " << getTimeDiff(t[3], t[4]) << " ms." << endl;
+    gettimeofday(&t[3], NULL);
+    cout << "time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
     cout << "Returning the results. " << endl;
 
     returnResults(rerankedResults, request, 100);
