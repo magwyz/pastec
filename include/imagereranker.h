@@ -113,8 +113,4 @@ private:
 };
 
 
-#define CV_RANSAC 8
-
-template<typename T> int icvCompressPoints( T* ptr, const uchar* mask, int mstep, int count );
-
 #endif // PASTEC_IMAGERERANKER_H
