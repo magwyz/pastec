@@ -31,7 +31,8 @@
 #include <messages.h>
 
 
-ORBIndex::ORBIndex(string indexPath)
+ORBIndex::ORBIndex(string indexPath, bool buildForwardIndex)
+    : buildForwardIndex(buildForwardIndex)
 {
     // Init the mutex.
     pthread_rwlock_init(&rwLock, NULL);
@@ -127,6 +128,10 @@ u_int32_t ORBIndex::addImage(unsigned i_imageId, list<HitForward> hitList)
         hitBack.x = hitFor.x;
         hitBack.y = hitFor.y;
 
+        if (buildForwardIndex)
+        {
+            forwardIndex[hitFor.i_imageId].push_back(hitFor.i_wordId);
+        }
         indexHits[hitFor.i_wordId].push_back(hitBack);
         nbWords[hitFor.i_imageId]++;
         nbOccurences[hitFor.i_wordId]++;
@@ -162,6 +167,21 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
 
     nbWords.erase(imgIt);
 
+    if (buildForwardIndex)
+    {
+        unordered_map<u_int64_t, vector<unsigned> >::iterator forwardIndexIt =
+            forwardIndex.find(i_imageId);
+
+        if (forwardIndexIt == forwardIndex.end())
+        {
+            cout << "Image " << i_imageId << " not found." << endl;
+            pthread_rwlock_unlock(&rwLock);
+            return IMAGE_NOT_FOUND;
+        }
+
+        forwardIndex.erase(forwardIndexIt);
+    }
+
     for (unsigned i_wordId = 0; i_wordId < NB_VISUAL_WORDS; ++i_wordId)
     {
         vector<Hit> &hits = indexHits[i_wordId];
@@ -184,6 +204,86 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
     cout << "Image " << i_imageId << " removed." << endl;
 
     return IMAGE_REMOVED;
+}
+
+
+/**
+ * @brief Get a list of hits associated with an image id.
+ * @param  the list of hits.
+ */
+u_int32_t ORBIndex::getImageWords(unsigned i_imageId, unordered_map<u_int32_t, list<Hit> > &hitList)
+{
+    pthread_rwlock_wrlock(&rwLock);
+
+    const unsigned i_nbTotalIndexedImages = getTotalNbIndexedImages();
+    const unsigned i_maxNbOccurences = i_nbTotalIndexedImages > 10000 ?
+                                       0.15 * i_nbTotalIndexedImages
+                                       : i_nbTotalIndexedImages;
+
+    unordered_map<u_int64_t, unsigned>::iterator imgIt =
+        nbWords.find(i_imageId);
+
+    if (imgIt == nbWords.end())
+    {
+        cout << "Image " << i_imageId << " not found." << endl;
+        pthread_rwlock_unlock(&rwLock);
+        return IMAGE_NOT_FOUND;
+    }
+
+    if (buildForwardIndex)
+    {
+        vector<unsigned> &words = forwardIndex[i_imageId];
+        vector<unsigned>::iterator word_it = words.begin();
+
+        while (word_it != words.end())
+        {
+            unsigned i_wordId = *word_it;
+
+            if (getWordNbOccurences(i_wordId) <= i_maxNbOccurences)
+            {
+                vector<Hit> &hits = indexHits[i_wordId];
+                vector<Hit>::iterator hit_it = hits.begin();
+
+                while (hit_it != hits.end())
+                {
+                    if (hit_it->i_imageId == i_imageId)
+                    {
+                        hitList[i_wordId].push_back(*hit_it);
+                        break;
+                    }
+                    ++hit_it;
+                }
+            }
+            ++word_it;
+        }
+    }
+    else
+    {
+        for (unsigned i_wordId = 0; i_wordId < NB_VISUAL_WORDS; ++i_wordId)
+        {
+            vector<Hit> &hits = indexHits[i_wordId];
+            vector<Hit>::iterator it = hits.begin();
+
+            while (it != hits.end())
+            {
+                if (it->i_imageId == i_imageId)
+                {
+                    if (getWordNbOccurences(i_wordId) <= i_maxNbOccurences)
+                    {
+                        hitList[i_wordId].push_back(*it);
+                    }
+                    break;
+                }
+                ++it;
+            }
+        }
+    }
+
+    pthread_rwlock_unlock(&rwLock);
+
+    cout << "Image " << i_imageId << " found with " << hitList.size() << " words." << endl;
+
+    return OK;
 }
 
 
@@ -256,6 +356,11 @@ bool ORBIndex::readIndex(string backwardIndexPath)
                 hits[i].i_angle = i_angle;
                 hits[i].x = x;
                 hits[i].y = y;
+
+                if (buildForwardIndex)
+                {
+                    forwardIndex[i_imageId].push_back(i_wordId);
+                }
             }
         }
 
@@ -333,6 +438,7 @@ u_int32_t ORBIndex::clear()
     }
 
     nbWords.clear();
+    forwardIndex.clear();
     totalNbRecords = 0;
     pthread_rwlock_unlock(&rwLock);
 

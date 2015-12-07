@@ -189,6 +189,44 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
             ret["scores"] = scores;
         }
     }
+    else if (testURIWithPattern(parsedURI, p_image)
+        && conInfo.connectionType == GET)
+    {
+        SearchRequest req;
+
+        req.imageId = atoi(parsedURI[2].c_str());
+        req.client = NULL;
+        u_int32_t i_ret = imageSearcher->searchSimilar(req);
+
+        ret["type"] = Converter::codeToString(i_ret);
+
+        if (i_ret == SEARCH_RESULTS)
+        {
+            // Return the image ids
+            Json::Value imageIds(Json::arrayValue);
+            for (unsigned i = 0; i < req.results.size(); ++i)
+                imageIds.append(req.results[i]);
+            ret["image_ids"] = imageIds;
+
+            // Return the bounding rects
+            Json::Value boundingRects(Json::arrayValue);
+            for (unsigned i = 0; i < req.boundingRects.size(); ++i)
+            {
+                Rect r = req.boundingRects[i];
+                Json::Value rVal;
+                rVal["x"] = r.x; rVal["y"] = r.y;
+                rVal["width"] = r.width; rVal["height"] = r.height;
+                boundingRects.append(rVal);
+            }
+            ret["bounding_rects"] = boundingRects;
+
+            // Return the scores
+            Json::Value scores(Json::arrayValue);
+            for (unsigned i = 0; i < req.scores.size(); ++i)
+                scores.append(req.scores[i]);
+            ret["scores"] = scores;
+        }
+    }
     else if (testURIWithPattern(parsedURI, p_ioIndex)
              && conInfo.connectionType == POST)
     {

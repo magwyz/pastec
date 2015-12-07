@@ -52,7 +52,7 @@ using namespace std::tr1;
 class ORBIndex : public Index
 {
 public:
-    ORBIndex(string indexPath);
+    ORBIndex(string indexPath, bool buildForwardIndex);
     virtual ~ORBIndex();
     void getImagesWithVisualWords(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
                                   unordered_map<u_int32_t, vector<Hit> > &indexHitsForReq);
@@ -61,6 +61,7 @@ public:
     unsigned getTotalNbIndexedImages();
     u_int32_t addImage(unsigned i_imageId, list<HitForward> hitList);
     u_int32_t removeImage(const unsigned i_imageId);
+    u_int32_t getImageWords(const unsigned i_imageId, unordered_map<u_int32_t, list<Hit> > &hitList);
     u_int32_t write(string backwardIndexPath);
     u_int32_t clear();
     u_int32_t load(string backwardIndexPath);
@@ -73,8 +74,10 @@ private:
 
     u_int64_t nbOccurences[NB_VISUAL_WORDS];
     u_int64_t totalNbRecords;
+    bool buildForwardIndex;
 
     unordered_map<u_int64_t, unsigned> nbWords;
+    unordered_map<u_int64_t, vector<unsigned> > forwardIndex;
     vector<Hit> indexHits[NB_VISUAL_WORDS];
 
     pthread_rwlock_t rwLock;
