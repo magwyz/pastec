@@ -46,9 +46,8 @@ void *RANSACThread::run()
             RANSACTask &task = imgTasks[i_imageId];
             assert(task.points1.size() == task.points2.size());
 
-            if (task.points1.size() >= 12)
+            if (task.points1.size() >= RANSAC_MIN_INLINERS)
             {
-                Mat mask;
                 Mat H = pastecEstimateRigidTransform(task.points2, task.points1, true);
 
                 if (countNonZero(H) == 0)

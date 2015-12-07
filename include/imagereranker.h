@@ -75,6 +75,7 @@ struct RANSACTask
 #define HISTOGRAM_NB_BINS 32
 #define DIFF_MIN -360.0f / (2.0f * HISTOGRAM_NB_BINS)
 
+
 struct Histogram
 {
     Histogram() : i_total(0)
@@ -85,6 +86,9 @@ struct Histogram
     unsigned bins[HISTOGRAM_NB_BINS];
     unsigned i_total;
 };
+
+
+#define RANSAC_MIN_INLINERS 12
 
 
 class RANSACThread : public Thread

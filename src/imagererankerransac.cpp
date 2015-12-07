@@ -272,7 +272,7 @@ cv::Mat RANSACThread::pastecEstimateRigidTransform(InputArray src1, InputArray s
                 good_idx[good_count++] = i;
         }
 
-        if(good_count >= 12)
+        if(good_count >= RANSAC_MIN_INLINERS)
             break;
     }
 
