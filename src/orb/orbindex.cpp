@@ -148,12 +148,35 @@ u_int32_t ORBIndex::addImage(unsigned i_imageId, list<HitForward> hitList)
 
 
 /**
+ * @brief Add a string tag to an image.
+ * @param  the tag to add.
+ */
+u_int32_t ORBIndex::addTag(const unsigned i_imageId, const string tag)
+{
+    pthread_rwlock_wrlock(&rwLock);
+    if (nbWords.find(i_imageId) == nbWords.end())
+        return IMAGE_NOT_FOUND;
+
+    tags[i_imageId] = tag;
+
+    pthread_rwlock_unlock(&rwLock);
+
+    cout << "Tag added for image " << i_imageId << "." << endl;
+
+    return IMAGE_TAG_ADDED;
+}
+
+
+/**
  * @brief Remove all the hits of an image.
  * @param i_imageId the image id.
  * @return true on success else false.
  */
 u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
 {
+    // First remove the image tag if there is one.
+    removeTag((u_int64_t)i_imageId);
+
     pthread_rwlock_wrlock(&rwLock);
     unordered_map<u_int64_t, unsigned>::iterator imgIt =
         nbWords.find(i_imageId);
@@ -282,6 +305,52 @@ u_int32_t ORBIndex::getImageWords(unsigned i_imageId, unordered_map<u_int32_t, l
     pthread_rwlock_unlock(&rwLock);
 
     cout << "Image " << i_imageId << " found with " << hitList.size() << " words." << endl;
+
+    return OK;
+}
+
+
+/**
+ * @brief Remove a string tag to an image.
+ */
+u_int32_t ORBIndex::removeTag(const unsigned i_imageId)
+{
+    pthread_rwlock_wrlock(&rwLock);
+
+    unordered_map<u_int64_t, string>::iterator tagIt =
+        tags.find(i_imageId);
+
+    if (tagIt == tags.end())
+        return IMAGE_TAG_NOT_FOUND;
+
+    tags.erase(tagIt);
+
+    pthread_rwlock_unlock(&rwLock);
+
+    cout << "Tag deleted for image " << i_imageId << "." << endl;
+
+    return IMAGE_TAG_REMOVED;
+}
+
+
+/**
+ * @brief Get the tag of an image.
+ * @param the image id,
+ * @param the returned tag.
+ */
+u_int32_t ORBIndex::getTag(const unsigned i_imageId, string &tag)
+{
+    pthread_rwlock_rdlock(&rwLock);
+
+    unordered_map<u_int64_t, string>::iterator tagIt =
+        tags.find(i_imageId);
+
+    if (tagIt == tags.end())
+        return IMAGE_TAG_NOT_FOUND;
+
+    tag = tagIt->second;
+
+    pthread_rwlock_unlock(&rwLock);
 
     return OK;
 }
@@ -439,6 +508,8 @@ u_int32_t ORBIndex::clear()
 
     nbWords.clear();
     forwardIndex.clear();
+    tags.clear();
+
     totalNbRecords = 0;
     pthread_rwlock_unlock(&rwLock);
 

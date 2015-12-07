@@ -41,6 +41,7 @@ struct SearchRequest
     vector<u_int32_t> results;
     vector<Rect> boundingRects;
     vector<float> scores;
+    vector<string> tags;
 };
 
 

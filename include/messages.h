@@ -41,8 +41,11 @@ enum MessagesOut
     IMAGE_NOT_DECODED =                 0x10050400,
     IMAGE_SIZE_TOO_SMALL =              0x10050500,
     IMAGE_NOT_FOUND =                   0x10050700,
+    IMAGE_TAG_NOT_FOUND =               0x10050701,
     IMAGE_ADDED =                       0x10050800,
     IMAGE_REMOVED =                     0x10050900,
+    IMAGE_TAG_ADDED =                   0x10051000,
+    IMAGE_TAG_REMOVED =                 0x10051100,
 
     INDEX_LOADED =                      0x10060100,
     INDEX_NOT_FOUND =                   0x10060200,
@@ -79,8 +82,11 @@ public:
             case IMAGE_NOT_DECODED: s = "IMAGE_NOT_DECODED"; break;
             case IMAGE_SIZE_TOO_SMALL: s = "IMAGE_SIZE_TOO_SMALL"; break;
             case IMAGE_NOT_FOUND: s = "IMAGE_NOT_FOUND"; break;
+            case IMAGE_TAG_NOT_FOUND: s = "IMAGE_TAG_NOT_FOUND"; break;
             case IMAGE_ADDED: s = "IMAGE_ADDED"; break;
             case IMAGE_REMOVED: s = "IMAGE_REMOVED"; break;
+            case IMAGE_TAG_ADDED: s = "IMAGE_TAG_ADDED"; break;
+            case IMAGE_TAG_REMOVED: s = "IMAGE_TAG_REMOVED"; break;
 
             case INDEX_LOADED: s = "INDEX_LOADED"; break;
             case INDEX_NOT_FOUND: s = "INDEX_NOT_FOUND"; break;

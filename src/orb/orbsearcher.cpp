@@ -312,6 +312,13 @@ void ORBSearcher::returnResults(priority_queue<SearchResult> &rankedResults,
         req.results.push_back(res.i_imageId);
         req.boundingRects.push_back(res.boundingRect);
         req.scores.push_back(res.f_weight);
+
+        string tag;
+        if (index->getTag(res.i_imageId, tag) == OK)
+            req.tags.push_back(tag);
+        else
+            req.tags.push_back("");
+
         rankedResults.pop();
     }
 }
