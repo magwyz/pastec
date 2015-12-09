@@ -61,6 +61,16 @@ class PastecConnection:
         ret = self.request("index/images/" + str(imageId), "DELETE")
         self.raiseExceptionIfNeeded(ret["type"])
 
+    def addTag(self, imageId, tag):
+        ret = self.request("index/images/%s/tag" % str(imageId), "PUT",
+            bytearray(tag, "UTF-8"))
+        print(ret)
+        self.raiseExceptionIfNeeded(ret["type"])
+
+    def remvoveTag(self, imageId):
+        ret = self.request("index/images/%s/tag" % str(imageId), "DELETE")
+        self.raiseExceptionIfNeeded(ret["type"])
+
     def loadIndex(self, path = ""):
         s = json.dumps({"type" : "LOAD", "index_path" : path})
         ret = self.request("index/io", "POST", bytearray(s, "UTF-8"))
@@ -89,7 +99,13 @@ class PastecConnection:
         ret = self.request("index/searcher", "POST", imageData)
         self.raiseExceptionIfNeeded(ret["type"])
         imageIds = ret["image_ids"]
-        return imageIds
+        tags = ret["tags"]
+        res = []
+        if len(imageIds) != len(tags):
+            raise PastecException("Image ids and tags arrays have different sizes.")
+        for i in range(len(imageIds)):
+            res += [(imageIds[i], tags[i])]
+        return res
 
     def ping(self):
         s = json.dumps({"type" : "PING"})
@@ -113,6 +129,8 @@ class PastecConnection:
             raise PastecException("Image size too small.")
         elif val == "IMAGE_NOT_FOUND":
             raise PastecException("Image not found.")
+        elif val == "IMAGE_TAG_NOT_FOUND":
+            raise PastecException("Image tag not found.")
 
         elif val == "INDEX_NOT_FOUND":
             raise PastecException("Index not found.")
