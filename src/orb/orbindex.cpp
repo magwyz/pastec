@@ -154,8 +154,10 @@ u_int32_t ORBIndex::addImage(unsigned i_imageId, list<HitForward> hitList)
 u_int32_t ORBIndex::addTag(const unsigned i_imageId, const string tag)
 {
     pthread_rwlock_wrlock(&rwLock);
-    if (nbWords.find(i_imageId) == nbWords.end())
+    if (nbWords.find(i_imageId) == nbWords.end()) {
+        pthread_rwlock_unlock(&rwLock);
         return IMAGE_NOT_FOUND;
+    }
 
     tags[i_imageId] = tag;
 
@@ -320,8 +322,10 @@ u_int32_t ORBIndex::removeTag(const unsigned i_imageId)
     unordered_map<u_int64_t, string>::iterator tagIt =
         tags.find(i_imageId);
 
-    if (tagIt == tags.end())
+    if (tagIt == tags.end()) {
+        pthread_rwlock_unlock(&rwLock);
         return IMAGE_TAG_NOT_FOUND;
+    }
 
     tags.erase(tagIt);
 
