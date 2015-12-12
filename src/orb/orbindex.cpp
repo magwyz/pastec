@@ -349,8 +349,10 @@ u_int32_t ORBIndex::getTag(const unsigned i_imageId, string &tag)
     unordered_map<u_int64_t, string>::iterator tagIt =
         tags.find(i_imageId);
 
-    if (tagIt == tags.end())
+    if (tagIt == tags.end()) {
+        pthread_rwlock_unlock(&rwLock);
         return IMAGE_TAG_NOT_FOUND;
+    }
 
     tag = tagIt->second;
 
