@@ -39,7 +39,7 @@ class RequestHandler
 {
 public:
     RequestHandler(FeatureExtractor *featureExtractor,
-                   Searcher *imageSearcher, Index *index);
+                   Searcher *imageSearcher, Index *index, string authKey);
     void handleRequest(ConnectionInfo &conInfo);
 
 private:
@@ -51,6 +51,8 @@ private:
     FeatureExtractor *featureExtractor;
     Searcher *imageSearcher;
     Index *index;
+
+    string authKey;
 };
 
 #endif // PASTEC_REQUESTHANDLER_H

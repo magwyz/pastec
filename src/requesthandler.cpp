@@ -39,9 +39,9 @@
 
 
 RequestHandler::RequestHandler(FeatureExtractor *featureExtractor,
-               Searcher *imageSearcher, Index *index)
+               Searcher *imageSearcher, Index *index, string authKey)
     : featureExtractor(featureExtractor), imageSearcher(imageSearcher),
-      index(index)
+      index(index), authKey(authKey)
 { }
 
 
@@ -130,7 +130,11 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     Json::Value ret;
     conInfo.answerCode = MHD_HTTP_OK;
 
-    if (testURIWithPattern(parsedURI, p_image)
+    if (authKey != "" && conInfo.authKey != authKey) {
+        conInfo.answerCode = MHD_HTTP_FORBIDDEN;
+        ret["type"] = Converter::codeToString(AUTHENTIFICATION_ERROR);
+    }
+    else if (testURIWithPattern(parsedURI, p_image)
         && conInfo.connectionType == PUT)
     {
         u_int32_t i_imageId = atoi(parsedURI[2].c_str());

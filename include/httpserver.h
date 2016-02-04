@@ -40,12 +40,13 @@ struct ConnectionInfo;
 class HTTPServer
 {
 public:
-    HTTPServer(RequestHandler *requestHandler, unsigned i_port);
+    HTTPServer(RequestHandler *requestHandler, unsigned i_port, bool https);
     ~HTTPServer();
     int run();
     int stop();
 
 private:
+    char *loadFile(const char *filename);
     static int answerToConnection(void *cls, MHD_Connection *connection,
                                   const char *url, const char *method,
                                   const char *version, const char *upload_data,
@@ -53,11 +54,14 @@ private:
     static void requestCompleted(void *cls, MHD_Connection *connection,
                                  void **con_cls, MHD_RequestTerminationCode toe);
     static int sendAnswer(struct MHD_Connection *connection, ConnectionInfo &conInfo);
+    static int readAuthHeader(void *cls, enum MHD_ValueKind kind,
+                              const char *key, const char *value);
 
     MHD_Daemon *daemon;
     RequestHandler *requestHandler;
 
     unsigned i_port;
+    bool https;
 
     pthread_cond_t stopCond;
     pthread_mutex_t stopMutex;
@@ -72,6 +76,7 @@ struct ConnectionInfo
     struct MHD_PostProcessor *postprocessor;
     string answerString;
     int answerCode;
+    string authKey;
 
     vector<char> uploadedData;
 };

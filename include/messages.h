@@ -33,6 +33,7 @@ enum MessagesOut
     OK =                                0x10010000,
     ERROR_GENERIC =                     0x10020000,
     MISFORMATTED_REQUEST =              0x10020100,
+    AUTHENTIFICATION_ERROR =            0x10020200,
     PONG =                              0x10030000,
     TOO_MANY_CLIENTS =                  0x10040000,
 
@@ -74,6 +75,7 @@ public:
             case OK: s = "OK"; break;
             case ERROR_GENERIC: s = "ERROR_GENERIC"; break;
             case MISFORMATTED_REQUEST: s = "MISFORMATTED_REQUEST"; break;
+            case AUTHENTIFICATION_ERROR: s = "AUTHENTIFICATION_ERROR"; break;
             case PONG: s = "PONG"; break;
             case TOO_MANY_CLIENTS: s = "TOO_MANY_CLIENTS"; break;
 

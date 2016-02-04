@@ -42,7 +42,7 @@ void intHandler(int signum) {
 void printUsage()
 {
     cout << "Usage :" << endl
-         << "./PastecIndex [-p portNumber] [-i indexPath] [--forward-index] visualWordList" << endl;
+         << "./PastecIndex [-p portNumber] [-i indexPath] [--forward-index] [--https] [--auth-key AuthKey] visualWordList" << endl;
 }
 
 
@@ -67,6 +67,8 @@ int main(int argc, char** argv)
     string visualWordPath;
     string indexPath(DEFAULT_INDEX_PATH);
     bool buildForwardIndex = false;
+    string authKey("");
+    bool https = false;
 
     int i = 1;
     while (i < argc)
@@ -80,6 +82,15 @@ int main(int argc, char** argv)
         {
             EXIT_IF_LAST_ARGUMENT()
             indexPath = argv[++i];
+        }
+        else if (string(argv[i]) == "--auth-key")
+        {
+            EXIT_IF_LAST_ARGUMENT()
+            authKey = argv[++i];
+        }
+        else if (string(argv[i]) == "--https")
+        {
+            https = true;
         }
         else if (string(argv[i]) == "--forward-index")
         {
@@ -101,8 +112,8 @@ int main(int argc, char** argv)
     ORBWordIndex *wordIndex = new ORBWordIndex(visualWordPath);
     FeatureExtractor *ife = new ORBFeatureExtractor((ORBIndex *)index, wordIndex);
     Searcher *is = new ORBSearcher((ORBIndex *)index, wordIndex);
-    RequestHandler *rh = new RequestHandler(ife, is, index);
-    s = new HTTPServer(rh, i_port);
+    RequestHandler *rh = new RequestHandler(ife, is, index, authKey);
+    s = new HTTPServer(rh, i_port, https);
 
     signal(SIGHUP, intHandler);
     signal(SIGINT, intHandler);

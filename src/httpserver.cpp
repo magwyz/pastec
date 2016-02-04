@@ -20,6 +20,8 @@
  *****************************************************************************/
 
 #include <iostream>
+#include <fstream>
+#include <algorithm>
 
 #include <sys/types.h>
 #include <sys/select.h>
@@ -33,9 +35,10 @@
 #define PORT            4213
 
 
-HTTPServer::HTTPServer(RequestHandler *requestHandler, unsigned i_port)
+HTTPServer::HTTPServer(RequestHandler *requestHandler, unsigned i_port,
+                       bool https)
     : daemon(NULL), requestHandler(requestHandler), i_port(i_port),
-      b_stop(false)
+      https(https), b_stop(false)
 {
     pthread_mutex_init(&stopMutex, NULL);
     pthread_cond_init(&stopCond, NULL);
@@ -49,12 +52,56 @@ HTTPServer::~HTTPServer()
 }
 
 
+char *HTTPServer::loadFile(const char *filename)
+{
+    ifstream file(filename, std::ios::binary);
+    file.seekg(0, std::ios::end);
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    char *buffer = new(std::nothrow) char[size];
+
+    if (buffer == NULL)
+        return NULL;
+
+    if (!file.read(buffer, size))
+        return NULL;
+
+    return buffer;
+}
+
+
 int HTTPServer::run()
 {
-    daemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, i_port, NULL, NULL,
-                              &answerToConnection, this,
-                              MHD_OPTION_NOTIFY_COMPLETED, requestCompleted,
-                              NULL, MHD_OPTION_END);
+    char *key_pem;
+    char *cert_pem;
+
+    if (https)
+    {
+        key_pem = loadFile("server.key");
+        cert_pem = loadFile("server.pem");
+
+        if (key_pem == NULL)
+            std::cout << "server.key not found." << std::endl;
+        if (cert_pem == NULL)
+            std::cout << "server.pem not found." << std::endl;
+
+        daemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL,
+                                  i_port, NULL, NULL,
+                                  &answerToConnection, this,
+                                  MHD_OPTION_NOTIFY_COMPLETED, requestCompleted, NULL,
+                                  MHD_OPTION_HTTPS_MEM_KEY, key_pem,
+                                  MHD_OPTION_HTTPS_MEM_CERT, cert_pem,
+                                  MHD_OPTION_END);
+    }
+    else
+    {
+        daemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, i_port, NULL, NULL,
+                                  &answerToConnection, this,
+                                  MHD_OPTION_NOTIFY_COMPLETED, requestCompleted,
+                                  NULL, MHD_OPTION_END);
+    }
+
     if (daemon == NULL)
         return ERROR_GENERIC;
 
@@ -66,6 +113,12 @@ int HTTPServer::run()
     pthread_mutex_unlock(&stopMutex);
 
     MHD_stop_daemon(daemon);
+
+    if (https)
+    {
+        delete[] key_pem;
+        delete[] cert_pem;
+    }
 
     return OK;
 }
@@ -148,6 +201,9 @@ int HTTPServer::answerToConnection(void *cls, MHD_Connection *connection,
 
         *conCls = (void *) conInfo;
 
+        MHD_get_connection_values(connection, MHD_HEADER_KIND,
+                                  &readAuthHeader, conInfo);
+
         return MHD_YES;
     }
 
@@ -174,4 +230,22 @@ int HTTPServer::answerToConnection(void *cls, MHD_Connection *connection,
     return sendAnswer(connection, *conInfo);
 }
 
+
+int HTTPServer::readAuthHeader(void *cls, enum MHD_ValueKind kind,
+                               const char *key, const char *value)
+{
+    (void) kind;
+    ConnectionInfo *conInfo = (ConnectionInfo *)cls;
+
+    string keyString(key);
+    std::transform(keyString.begin(), keyString.end(), keyString.begin(), ::tolower);
+
+    if (keyString == "authkey")
+    {
+        conInfo->authKey = string(value);
+        return MHD_NO;
+    }
+
+    return MHD_YES;
+}
 
