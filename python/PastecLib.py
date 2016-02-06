@@ -81,6 +81,16 @@ class PastecConnection:
         ret = self.request("index/io", "POST", bytearray(s, "UTF-8"))
         self.raiseExceptionIfNeeded(ret["type"])
 
+    def loadIndexTags(self, path = ""):
+        s = json.dumps({"type" : "LOAD_TAGS", "index_tags_path" : path})
+        ret = self.request("index/io", "POST", bytearray(s, "UTF-8"))
+        self.raiseExceptionIfNeeded(ret["type"])
+
+    def writeIndexTags(self, path = ""):
+        s = json.dumps({"type" : "WRITE_TAGS", "index_tags_path" : path})
+        ret = self.request("index/io", "POST", bytearray(s, "UTF-8"))
+        self.raiseExceptionIfNeeded(ret["type"])
+
     def clearIndex(self):
         s = json.dumps({"type" : "CLEAR"})
         ret = self.request("index/io", "POST", bytearray(s, "UTF-8"))
@@ -134,7 +144,11 @@ class PastecConnection:
 
         elif val == "INDEX_NOT_FOUND":
             raise PastecException("Index not found.")
+        elif val == "INDEX_TAGS_NOT_FOUND":
+            raise PastecException("Index tags not found.")
         elif val == "INDEX_NOT_WRITTEN":
+            raise PastecException("Index not written.")
+        elif val == "INDEX_TAGS_NOT_WRITTEN":
             raise PastecException("Index not written.")
 
     def loadFileData(self, filePath):
