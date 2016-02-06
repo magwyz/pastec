@@ -319,7 +319,7 @@ u_int32_t ORBIndex::removeTag(const unsigned i_imageId)
 {
     pthread_rwlock_wrlock(&rwLock);
 
-    unordered_map<u_int64_t, string>::iterator tagIt =
+    unordered_map<u_int32_t, string>::iterator tagIt =
         tags.find(i_imageId);
 
     if (tagIt == tags.end()) {
@@ -346,7 +346,7 @@ u_int32_t ORBIndex::getTag(const unsigned i_imageId, string &tag)
 {
     pthread_rwlock_rdlock(&rwLock);
 
-    unordered_map<u_int64_t, string>::iterator tagIt =
+    unordered_map<u_int32_t, string>::iterator tagIt =
         tags.find(i_imageId);
 
     if (tagIt == tags.end()) {

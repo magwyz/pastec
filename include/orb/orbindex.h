@@ -81,7 +81,7 @@ private:
 
     unordered_map<u_int64_t, unsigned> nbWords;
     unordered_map<u_int64_t, vector<unsigned> > forwardIndex;
-    unordered_map<u_int64_t, string> tags;
+    unordered_map<u_int32_t, string> tags;
     vector<Hit> indexHits[NB_VISUAL_WORDS];
 
     pthread_rwlock_t rwLock;
