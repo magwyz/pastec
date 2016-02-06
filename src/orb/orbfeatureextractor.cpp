@@ -21,11 +21,7 @@
 
 #include <iostream>
 #include <set>
-#ifndef __APPLE__
-#include <tr1/unordered_set>
-#else
 #include <unordered_set>
-#endif
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>

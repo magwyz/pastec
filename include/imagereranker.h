@@ -26,13 +26,8 @@
 
 #include <queue>
 #include <list>
-#ifndef __APPLE__
-#include <tr1/unordered_map>
-#include <tr1/unordered_set>
-#else
 #include <unordered_map>
 #include <unordered_set>
-#endif
 
 #include <opencv2/core/core.hpp>
 
@@ -41,9 +36,6 @@
 #include <hit.h>
 
 using namespace std;
-#ifndef __APPLE__
-using namespace std::tr1;
-#endif
 using namespace cv;
 
 
@@ -51,8 +43,8 @@ class ImageReranker
 {
 public:
     ImageReranker() {}
-    void rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
-                unordered_map<u_int32_t, vector<Hit> > &indexHits,
+    void rerank(std::unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
+                std::unordered_map<u_int32_t, vector<Hit> > &indexHits,
                 priority_queue<SearchResult> &rankedResultsIn,
                 priority_queue<SearchResult> &rankedResultsOut,
                 unsigned i_nbResults);
@@ -95,7 +87,7 @@ class RANSACThread : public Thread
 {
 public:
     RANSACThread(pthread_mutex_t &mutex,
-                 unordered_map<u_int32_t, RANSACTask> &imgTasks,
+                 std::unordered_map<u_int32_t, RANSACTask> &imgTasks,
                  priority_queue<SearchResult> &rankedResultsOut)
         : mutex(mutex), imgTasks(imgTasks), rankedResultsOut(rankedResultsOut)
     { }
@@ -104,7 +96,7 @@ public:
     void *run();
 
     pthread_mutex_t &mutex;
-    unordered_map<u_int32_t, RANSACTask> &imgTasks;
+    std::unordered_map<u_int32_t, RANSACTask> &imgTasks;
     priority_queue<SearchResult> &rankedResultsOut;
     deque<unsigned> imageIds;
     deque<Histogram> histograms;

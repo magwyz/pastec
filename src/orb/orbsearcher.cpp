@@ -63,7 +63,7 @@ class RankingThread : public Thread
 {
 public:
     RankingThread(ORBIndex *index, const unsigned i_nbTotalIndexedImages,
-                  unordered_map<u_int32_t, vector<Hit> > &indexHits)
+                  std::unordered_map<u_int32_t, vector<Hit> > &indexHits)
         : index(index), i_nbTotalIndexedImages(i_nbTotalIndexedImages),
           indexHits(indexHits) { }
 
@@ -98,9 +98,9 @@ public:
 
     ORBIndex *index;
     const unsigned i_nbTotalIndexedImages;
-    unordered_map<u_int32_t, vector<Hit> > &indexHits;
+    std::unordered_map<u_int32_t, vector<Hit> > &indexHits;
     deque<u_int32_t> wordIds;
-    unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
+    std::unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
 };
 
 
@@ -136,7 +136,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
                                        0.15 * i_nbTotalIndexedImages
                                        : i_nbTotalIndexedImages;
 
-    unordered_map<u_int32_t, list<Hit> > imageReqHits; // key: visual word, value: the found angles
+    std::unordered_map<u_int32_t, list<Hit> > imageReqHits; // key: visual word, value: the found angles
     for (unsigned i = 0; i < keypoints.size(); ++i)
     {
         #define NB_NEIGHBORS 1
@@ -186,7 +186,7 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
     cout << "Loading the image words from the index." << endl;
 
     // key: visual word, value: the found angles
-    unordered_map<u_int32_t, list<Hit> > imageReqHits;
+    std::unordered_map<u_int32_t, list<Hit> > imageReqHits;
     u_int32_t i_ret = index->getImageWords(request.imageId, imageReqHits);
 
     if (i_ret != OK)
@@ -200,7 +200,7 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
 
 
 u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
-        unordered_map<u_int32_t, list<Hit> > imageReqHits)
+        std::unordered_map<u_int32_t, list<Hit> > imageReqHits)
 {
     timeval t[7];
     gettimeofday(&t[0], NULL);
@@ -210,7 +210,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     cout << imageReqHits.size() << " visual words kept for the request." << endl;
     cout << i_nbTotalIndexedImages << " images indexed in the index." << endl;
 
-    unordered_map<u_int32_t, vector<Hit> > indexHits; // key: visual word id, values: index hits.
+    std::unordered_map<u_int32_t, vector<Hit> > indexHits; // key: visual word id, values: index hits.
     indexHits.rehash(imageReqHits.size());
     index->getImagesWithVisualWords(imageReqHits, indexHits);
 
@@ -225,7 +225,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     unsigned i_wordsPerThread = indexHits.size() / NB_RANKING_THREAD + 1;
     RankingThread *threads[NB_RANKING_THREAD];
 
-    unordered_map<u_int32_t, vector<Hit> >::const_iterator it = indexHits.begin();
+    std::unordered_map<u_int32_t, vector<Hit> >::const_iterator it = indexHits.begin();
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
     {
         threads[i] = new RankingThread(index, i_nbTotalIndexedImages, indexHits);
@@ -248,10 +248,10 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     cout << "compute time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
 
     // Reduce...
-    unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
+    std::unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
     weights.rehash(i_nbTotalIndexedImages);
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
-        for (unordered_map<u_int32_t, float>::const_iterator it = threads[i]->weights.begin();
+        for (std::unordered_map<u_int32_t, float>::const_iterator it = threads[i]->weights.begin();
             it != threads[i]->weights.end(); ++it)
             weights[it->first] += it->second;
 
@@ -265,7 +265,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     index->unlock();
 
     priority_queue<SearchResult> rankedResults;
-    for (unordered_map<unsigned, float>::const_iterator it = weights.begin();
+    for (std::unordered_map<unsigned, float>::const_iterator it = weights.begin();
          it != weights.end(); ++it)
     {
         //cout << "Second: " << it->second << " First: " << it->first << endl;

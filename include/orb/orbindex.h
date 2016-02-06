@@ -30,20 +30,13 @@
 #include <map>
 #include <vector>
 #include <list>
-#ifndef __APPLE__
-#include <tr1/unordered_map>
-#else
 #include <unordered_map>
-#endif
 
 #include <hit.h>
 #include <backwardindexreaderaccess.h>
 #include <index.h>
 
 using namespace std;
-#ifndef __APPLE__
-using namespace std::tr1;
-#endif
 
 
 #define NB_VISUAL_WORDS 1000000
@@ -54,8 +47,8 @@ class ORBIndex : public Index
 public:
     ORBIndex(string indexPath, bool buildForwardIndex);
     virtual ~ORBIndex();
-    void getImagesWithVisualWords(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
-                                  unordered_map<u_int32_t, vector<Hit> > &indexHitsForReq);
+    void getImagesWithVisualWords(std::unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
+                                  std::unordered_map<u_int32_t, vector<Hit> > &indexHitsForReq);
     unsigned getWordNbOccurences(unsigned i_wordId);
     unsigned countTotalNbWord(unsigned i_imageId);
     unsigned getTotalNbIndexedImages();
@@ -69,6 +62,10 @@ public:
     u_int32_t clear();
     u_int32_t load(string backwardIndexPath);
     u_int32_t getImageIds(vector<u_int32_t> &imageIds);
+
+    u_int32_t loadIndexTags(string indexTagsPath);
+    u_int32_t writeIndexTags(string indexTagsPath);
+
     void readLock();
     void unlock();
 

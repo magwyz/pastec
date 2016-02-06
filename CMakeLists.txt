@@ -32,6 +32,7 @@ set(HEADERS      include/thread.h
                  include/requesthandler.h)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
