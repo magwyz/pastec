@@ -395,11 +395,13 @@ bool ORBIndex::readIndex(string backwardIndexPath)
         /* Count the number of words per image. */
         cout << "Counting the number of words per image." << endl;
         totalNbRecords = 0;
-        while (!indexAccess.endOfIndex())
+        while (true)
         {
             u_int32_t i_imageId;
             u_int16_t i_angle, x, y;
             indexAccess.read((char *)&i_imageId, sizeof(u_int32_t));
+            if (indexAccess.endOfIndex())
+                break;
             indexAccess.read((char *)&i_angle, sizeof(u_int16_t));
             indexAccess.read((char *)&x, sizeof(u_int16_t));
             indexAccess.read((char *)&y, sizeof(u_int16_t));
