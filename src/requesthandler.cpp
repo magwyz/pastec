@@ -278,6 +278,10 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
             i_ret = index->load(data["index_path"].asString());
         else if (data["type"] == "WRITE")
             i_ret = index->write(data["index_path"].asString());
+        else if (data["type"] == "LOAD_TAGS")
+            i_ret = index->loadTags(data["index_tags_path"].asString());
+        else if (data["type"] == "WRITE_TAGS")
+            i_ret = index->writeTags(data["index_tags_path"].asString());
         else if (data["type"] == "CLEAR")
             i_ret = index->clear();
         else

@@ -49,9 +49,13 @@ enum MessagesOut
     IMAGE_TAG_REMOVED =                 0x10051100,
 
     INDEX_LOADED =                      0x10060100,
+    INDEX_TAGS_LOADED =                 0x10060110,
     INDEX_NOT_FOUND =                   0x10060200,
+    INDEX_TAGS_NOT_FOUND =              0x10060210,
     INDEX_WRITTEN =                     0x10060300,
+    INDEX_TAGS_WRITTEN =                0x10060310,
     INDEX_NOT_WRITTEN =                 0x10060400,
+    INDEX_TAGS_NOT_WRITTEN =            0x10060410,
     INDEX_CLEARED =                     0x10060500,
     INDEX_IMAGE_IDS =                   0x10060600,
 
@@ -91,9 +95,13 @@ public:
             case IMAGE_TAG_REMOVED: s = "IMAGE_TAG_REMOVED"; break;
 
             case INDEX_LOADED: s = "INDEX_LOADED"; break;
+            case INDEX_TAGS_LOADED: s = "INDEX_TAGS_LOADED"; break;
             case INDEX_NOT_FOUND: s = "INDEX_NOT_FOUND"; break;
+            case INDEX_TAGS_NOT_FOUND: s = "INDEX_TAGS_NOT_FOUND"; break;
             case INDEX_WRITTEN: s = "INDEX_WRITTEN"; break;
+            case INDEX_TAGS_WRITTEN: s = "INDEX_TAGS_WRITTEN"; break;
             case INDEX_NOT_WRITTEN: s = "INDEX_NOT_WRITTEN"; break;
+            case INDEX_TAGS_NOT_WRITTEN: s = "INDEX_TAGS_NOT_WRITTEN"; break;
             case INDEX_CLEARED: s = "INDEX_CLEARED"; break;
             case INDEX_IMAGE_IDS: s = "INDEX_IMAGE_IDS"; break;
 

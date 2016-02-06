@@ -31,6 +31,7 @@ using namespace std;
 class HitForward;
 
 #define DEFAULT_INDEX_PATH "backwardIndex.dat"
+#define DEFAULT_INDEX_TAGS_PATH "indexTags.dat"
 
 class Index
 {
@@ -43,6 +44,9 @@ public:
     virtual u_int32_t clear() = 0;
     virtual u_int32_t load(string backwardIndexPath) = 0;
     virtual u_int32_t getImageIds(vector<u_int32_t> &imageIds) = 0;
+
+    virtual u_int32_t loadTags(string indexTagsPath) = 0;
+    virtual u_int32_t writeTags(string indexTagsPath) = 0;
 };
 
 #endif // PASTEC_INDEX_H

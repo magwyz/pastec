@@ -154,6 +154,7 @@ u_int32_t ORBIndex::addImage(unsigned i_imageId, list<HitForward> hitList)
 u_int32_t ORBIndex::addTag(const unsigned i_imageId, const string tag)
 {
     pthread_rwlock_wrlock(&rwLock);
+
     if (nbWords.find(i_imageId) == nbWords.end()) {
         pthread_rwlock_unlock(&rwLock);
         return IMAGE_NOT_FOUND;
@@ -539,6 +540,94 @@ u_int32_t ORBIndex::load(string backwardIndexPath)
 
     return INDEX_LOADED;
 }
+
+
+/**
+ * @brief Load the index tags from a file.
+ * @param indexTagsPath the path to the index tags file.
+ * @return the operation code.
+ */
+u_int32_t ORBIndex::loadTags(string indexTagsPath)
+{
+    if (indexTagsPath == "")
+        indexTagsPath = DEFAULT_INDEX_TAGS_PATH;
+
+    ifstream ifs;
+
+    ifs.open(indexTagsPath.c_str(), ios_base::binary);
+    if (!ifs.good())
+    {
+        cout << "Could not open the index tags file." << endl;
+        return INDEX_TAGS_NOT_FOUND;
+    }
+
+    tags.clear();
+    while (true)
+    {
+        // Read the image tag.
+        u_int32_t i_imageId;
+        u_int32_t i_tagSize;
+        ifs.read((char *)&i_imageId, sizeof(u_int32_t));
+        if (ifs.eof())
+            break;
+        ifs.read((char *)&i_tagSize, sizeof(u_int32_t));
+        char psz_tag[i_tagSize];
+        ifs.read((char *)psz_tag, i_tagSize);
+
+        cout << i_imageId << " " << i_tagSize << " " << psz_tag << endl;
+
+        // Save it into the memory.
+        tags[i_imageId] = string(psz_tag);
+    }
+
+    return INDEX_TAGS_LOADED;
+}
+
+
+/**
+ * @brief Write the index image tags into a file.
+ * @param indexTagsPath the path to the index tags file.
+ * @return the operation code.
+ */
+u_int32_t ORBIndex::writeTags(string indexTagsPath)
+{
+    if (indexTagsPath == "")
+        indexTagsPath = DEFAULT_INDEX_TAGS_PATH;
+
+    ofstream ofs;
+
+    ofs.open(indexTagsPath.c_str(), ios_base::binary);
+    if (!ofs.good())
+    {
+        cout << "Could not open the index tags file." << endl;
+        return INDEX_TAGS_NOT_WRITTEN;
+    }
+
+    pthread_rwlock_rdlock(&rwLock);
+
+    cout << "Writing the index image tags." << endl;
+
+    for (unordered_map<u_int32_t, string>::const_iterator it = tags.begin();
+         it != tags.end(); ++it)
+    {
+        u_int32_t i_imageId = it->first;
+        const char *psz_tag = it->second.c_str();
+        u_int32_t i_tagSize = strlen(psz_tag) + 1;
+
+        ofs.write((char *)(&i_imageId), sizeof(u_int32_t));
+        ofs.write((char *)(&i_tagSize), sizeof(u_int32_t));
+        ofs.write((char *)(psz_tag), i_tagSize);
+        cout << "plop!" << endl;
+    }
+
+    ofs.close();
+    cout << "Writing done." << endl;
+
+    pthread_rwlock_unlock(&rwLock);
+
+    return INDEX_TAGS_WRITTEN;
+}
+
 
 
 /**

@@ -63,8 +63,8 @@ public:
     u_int32_t load(string backwardIndexPath);
     u_int32_t getImageIds(vector<u_int32_t> &imageIds);
 
-    u_int32_t loadIndexTags(string indexTagsPath);
-    u_int32_t writeIndexTags(string indexTagsPath);
+    u_int32_t loadTags(string indexTagsPath);
+    u_int32_t writeTags(string indexTagsPath);
 
     void readLock();
     void unlock();
