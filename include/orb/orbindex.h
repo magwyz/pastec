@@ -70,8 +70,6 @@ public:
     void unlock();
 
 private:
-    bool readIndex(string backwardIndexPath);
-
     u_int64_t nbOccurences[NB_VISUAL_WORDS];
     u_int64_t totalNbRecords;
     bool buildForwardIndex;

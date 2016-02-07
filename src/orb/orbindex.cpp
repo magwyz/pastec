@@ -41,7 +41,7 @@ ORBIndex::ORBIndex(string indexPath, bool buildForwardIndex)
     for (unsigned i = 0; i < NB_VISUAL_WORDS; ++i)
         nbOccurences[i] = 0;
 
-    readIndex(indexPath);
+    load(indexPath);
 }
 
 
@@ -364,95 +364,6 @@ u_int32_t ORBIndex::getTag(const unsigned i_imageId, string &tag)
 
 
 /**
- * @brief Read the index and store it in memory.
- * @return true on success else false
- */
-bool ORBIndex::readIndex(string backwardIndexPath)
-{
-    // Open the file.
-    BackwardIndexReaderFileAccess indexAccess;
-    if (!indexAccess.open(backwardIndexPath))
-    {
-        cout << "Could not open the backward index file." << endl
-             << "Using an empty index." << endl;
-        return false;
-    }
-    else
-    {
-        pthread_rwlock_wrlock(&rwLock);
-
-        /* Read the table to know where are located the lines corresponding to each
-         * visual word. */
-        cout << "Reading the numbers of occurences." << endl;
-        u_int64_t *wordOffSet = new u_int64_t[NB_VISUAL_WORDS];
-        u_int64_t i_offset = NB_VISUAL_WORDS * sizeof(u_int64_t);
-        for (unsigned i = 0; i < NB_VISUAL_WORDS; ++i)
-        {
-            indexAccess.read((char *)(nbOccurences + i), sizeof(u_int64_t));
-            wordOffSet[i] = i_offset;
-            i_offset += nbOccurences[i] * BACKWARD_INDEX_ENTRY_SIZE;
-        }
-
-        /* Count the number of words per image. */
-        cout << "Counting the number of words per image." << endl;
-        totalNbRecords = 0;
-        while (true)
-        {
-            u_int32_t i_imageId;
-            u_int16_t i_angle, x, y;
-            indexAccess.read((char *)&i_imageId, sizeof(u_int32_t));
-            if (indexAccess.endOfIndex())
-                break;
-            indexAccess.read((char *)&i_angle, sizeof(u_int16_t));
-            indexAccess.read((char *)&x, sizeof(u_int16_t));
-            indexAccess.read((char *)&y, sizeof(u_int16_t));
-            nbWords[i_imageId]++;
-            totalNbRecords++;
-        }
-
-        indexAccess.reset();
-
-        cout << "Loading the index in memory." << endl;
-
-        for (unsigned i_wordId = 0; i_wordId < NB_VISUAL_WORDS; ++i_wordId)
-        {
-            indexAccess.moveAt(wordOffSet[i_wordId]);
-            vector<Hit> &hits = indexHits[i_wordId];
-
-            const unsigned i_nbOccurences = nbOccurences[i_wordId];
-            hits.resize(i_nbOccurences);
-
-            for (u_int64_t i = 0; i < i_nbOccurences; ++i)
-            {
-                u_int32_t i_imageId;
-                u_int16_t i_angle, x, y;
-                indexAccess.read((char *)&i_imageId, sizeof(u_int32_t));
-                indexAccess.read((char *)&i_angle, sizeof(u_int16_t));
-                indexAccess.read((char *)&x, sizeof(u_int16_t));
-                indexAccess.read((char *)&y, sizeof(u_int16_t));
-                hits[i].i_imageId = i_imageId;
-                hits[i].i_angle = i_angle;
-                hits[i].x = x;
-                hits[i].y = y;
-
-                if (buildForwardIndex)
-                {
-                    forwardIndex[i_imageId].push_back(i_wordId);
-                }
-            }
-        }
-
-        indexAccess.close();
-        delete[] wordOffSet;
-
-        pthread_rwlock_unlock(&rwLock);
-
-        return true;
-    }
-}
-
-
-/**
  * @brief Write the index in memory to a file.
  * @param backwardIndexPath
  * @return the operation code
@@ -535,10 +446,91 @@ u_int32_t ORBIndex::clear()
  */
 u_int32_t ORBIndex::load(string backwardIndexPath)
 {
-    clear();
-    readIndex(backwardIndexPath);
+    u_int32_t i_ret;
 
-    return INDEX_LOADED;
+    // Open the file.
+    BackwardIndexReaderFileAccess indexAccess;
+    if (!indexAccess.open(backwardIndexPath))
+    {
+        cout << "Could not open the backward index file." << endl;
+        i_ret = INDEX_NOT_FOUND;
+    }
+    else
+    {
+        clear();
+
+        pthread_rwlock_wrlock(&rwLock);
+
+        /* Read the table to know where are located the lines corresponding to each
+         * visual word. */
+        cout << "Reading the numbers of occurences." << endl;
+        u_int64_t *wordOffSet = new u_int64_t[NB_VISUAL_WORDS];
+        u_int64_t i_offset = NB_VISUAL_WORDS * sizeof(u_int64_t);
+        for (unsigned i = 0; i < NB_VISUAL_WORDS; ++i)
+        {
+            indexAccess.read((char *)(nbOccurences + i), sizeof(u_int64_t));
+            wordOffSet[i] = i_offset;
+            i_offset += nbOccurences[i] * BACKWARD_INDEX_ENTRY_SIZE;
+        }
+
+        /* Count the number of words per image. */
+        cout << "Counting the number of words per image." << endl;
+        totalNbRecords = 0;
+        while (true)
+        {
+            u_int32_t i_imageId;
+            u_int16_t i_angle, x, y;
+            indexAccess.read((char *)&i_imageId, sizeof(u_int32_t));
+            if (indexAccess.endOfIndex())
+                break;
+            indexAccess.read((char *)&i_angle, sizeof(u_int16_t));
+            indexAccess.read((char *)&x, sizeof(u_int16_t));
+            indexAccess.read((char *)&y, sizeof(u_int16_t));
+            nbWords[i_imageId]++;
+            totalNbRecords++;
+        }
+
+        indexAccess.reset();
+
+        cout << "Loading the index in memory." << endl;
+
+        for (unsigned i_wordId = 0; i_wordId < NB_VISUAL_WORDS; ++i_wordId)
+        {
+            indexAccess.moveAt(wordOffSet[i_wordId]);
+            vector<Hit> &hits = indexHits[i_wordId];
+
+            const unsigned i_nbOccurences = nbOccurences[i_wordId];
+            hits.resize(i_nbOccurences);
+
+            for (u_int64_t i = 0; i < i_nbOccurences; ++i)
+            {
+                u_int32_t i_imageId;
+                u_int16_t i_angle, x, y;
+                indexAccess.read((char *)&i_imageId, sizeof(u_int32_t));
+                indexAccess.read((char *)&i_angle, sizeof(u_int16_t));
+                indexAccess.read((char *)&x, sizeof(u_int16_t));
+                indexAccess.read((char *)&y, sizeof(u_int16_t));
+                hits[i].i_imageId = i_imageId;
+                hits[i].i_angle = i_angle;
+                hits[i].x = x;
+                hits[i].y = y;
+
+                if (buildForwardIndex)
+                {
+                    forwardIndex[i_imageId].push_back(i_wordId);
+                }
+            }
+        }
+
+        indexAccess.close();
+        delete[] wordOffSet;
+
+        pthread_rwlock_unlock(&rwLock);
+
+        i_ret = INDEX_LOADED;
+    }
+
+    return i_ret;
 }
 
 
@@ -583,6 +575,7 @@ u_int32_t ORBIndex::loadTags(string indexTagsPath)
     }
 
     pthread_rwlock_unlock(&rwLock);
+
     return INDEX_TAGS_LOADED;
 }
 
