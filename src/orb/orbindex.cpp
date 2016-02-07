@@ -561,6 +561,8 @@ u_int32_t ORBIndex::loadTags(string indexTagsPath)
         return INDEX_TAGS_NOT_FOUND;
     }
 
+    pthread_rwlock_wrlock(&rwLock);
+
     tags.clear();
     while (true)
     {
@@ -580,6 +582,7 @@ u_int32_t ORBIndex::loadTags(string indexTagsPath)
         tags[i_imageId] = string(psz_tag);
     }
 
+    pthread_rwlock_unlock(&rwLock);
     return INDEX_TAGS_LOADED;
 }
 
