@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <list>
 #include <string>
+#include <vector>
 
 using namespace std;
 

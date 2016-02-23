@@ -25,10 +25,12 @@
 #include <sys/types.h>
 
 
+class Index;
+
 class FeatureExtractor
 {
 public:
-    virtual u_int32_t processNewImage(unsigned i_imageId, unsigned i_imgSize,
+    virtual u_int32_t processNewImage(Index *index, unsigned i_imageId, unsigned i_imgSize,
                                       char *p_imgData, unsigned &i_nbFeaturesExtracted) = 0;
 };
 

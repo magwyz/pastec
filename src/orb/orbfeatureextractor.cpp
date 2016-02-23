@@ -30,14 +30,15 @@
 #include <orbfeatureextractor.h>
 #include <messages.h>
 #include <imageloader.h>
+#include <orb/orbindex.h>
 
 
-ORBFeatureExtractor::ORBFeatureExtractor(ORBIndex *index, ORBWordIndex *wordIndex)
-    : index(index), wordIndex(wordIndex)
+ORBFeatureExtractor::ORBFeatureExtractor(ORBWordIndex *wordIndex)
+    : wordIndex(wordIndex)
 { }
 
 
-u_int32_t ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_imgSize,
+u_int32_t ORBFeatureExtractor::processNewImage(Index *index, unsigned i_imageId, unsigned i_imgSize,
                                                char *p_imgData, unsigned &i_nbFeaturesExtracted)
 {
     Mat img;
@@ -97,5 +98,5 @@ u_int32_t ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_im
 #endif
 
     // Record the hits.
-    return index->addImage(i_imageId, imageHits);
+    return static_cast<ORBIndex *>(index)->addImage(i_imageId, imageHits);
 }

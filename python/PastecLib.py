@@ -48,65 +48,65 @@ class PastecConnection:
         ret = f.read().decode()
         return json.loads(ret)
 
-    def indexImageFile(self, imageId, filePath):
-        return self.indexImageData(imageId, self.loadFileData(filePath))
+    def indexImageFile(self, index, imageId, filePath):
+        return self.indexImageData(index, imageId, self.loadFileData(filePath))
 
-    def indexImageData(self, imageId, imageData):
-        ret = self.request("index/images/" + str(imageId), "PUT", imageData)
+    def indexImageData(self, index, imageId, imageData):
+        ret = self.request("indexes/" + index + "/images/" + str(imageId), "PUT", imageData)
         self.raiseExceptionIfNeeded(ret["type"])
         return {"image_id" : ret["image_id"],
                 "nb_features_extracted" : ret["nb_features_extracted"]}
 
-    def removeImage(self, imageId):
-        ret = self.request("index/images/" + str(imageId), "DELETE")
+    def removeImage(self, index, imageId):
+        ret = self.request("indexes/" + index + "/images/" + str(imageId), "DELETE")
         self.raiseExceptionIfNeeded(ret["type"])
 
-    def addTag(self, imageId, tag):
-        ret = self.request("index/images/%s/tag" % str(imageId), "PUT",
+    def addTag(self, index, imageId, tag):
+        ret = self.request("indexes/" + index + "/images/%s/tag" % str(imageId), "PUT",
             bytearray(tag, "UTF-8"))
         print(ret)
         self.raiseExceptionIfNeeded(ret["type"])
 
-    def remvoveTag(self, imageId):
-        ret = self.request("index/images/%s/tag" % str(imageId), "DELETE")
+    def remvoveTag(self, index, imageId):
+        ret = self.request("indexes/" + index + "/images/%s/tag" % str(imageId), "DELETE")
         self.raiseExceptionIfNeeded(ret["type"])
 
-    def loadIndex(self, path = ""):
+    def loadIndex(self, index, path = ""):
         s = json.dumps({"type" : "LOAD", "index_path" : path})
-        ret = self.request("index/io", "POST", bytearray(s, "UTF-8"))
+        ret = self.request("indexes/" + index + "/io", "POST", bytearray(s, "UTF-8"))
         self.raiseExceptionIfNeeded(ret["type"])
 
-    def writeIndex(self, path = ""):
+    def writeIndex(self, index, path = ""):
         s = json.dumps({"type" : "WRITE", "index_path" : path})
-        ret = self.request("index/io", "POST", bytearray(s, "UTF-8"))
+        ret = self.request("indexes/" + index + "/io", "POST", bytearray(s, "UTF-8"))
         self.raiseExceptionIfNeeded(ret["type"])
 
-    def loadIndexTags(self, path = ""):
+    def loadIndexTags(self, index, path = ""):
         s = json.dumps({"type" : "LOAD_TAGS", "index_tags_path" : path})
-        ret = self.request("index/io", "POST", bytearray(s, "UTF-8"))
+        ret = self.request("indexes/" + index + "/io", "POST", bytearray(s, "UTF-8"))
         self.raiseExceptionIfNeeded(ret["type"])
 
-    def writeIndexTags(self, path = ""):
+    def writeIndexTags(self, index, path = ""):
         s = json.dumps({"type" : "WRITE_TAGS", "index_tags_path" : path})
-        ret = self.request("index/io", "POST", bytearray(s, "UTF-8"))
+        ret = self.request("indexes/" + index + "/io", "POST", bytearray(s, "UTF-8"))
         self.raiseExceptionIfNeeded(ret["type"])
 
-    def clearIndex(self):
+    def clearIndex(self, index):
         s = json.dumps({"type" : "CLEAR"})
-        ret = self.request("index/io", "POST", bytearray(s, "UTF-8"))
+        ret = self.request("indexes/" + index + "/io", "POST", bytearray(s, "UTF-8"))
         self.raiseExceptionIfNeeded(ret["type"])
 
-    def getIndexImageIds(self):
-        ret = self.request("index/imageIds", "GET")
+    def getIndexImageIds(self, index):
+        ret = self.request("indexes/" + index + "/imageIds", "GET")
         self.raiseExceptionIfNeeded(ret["type"])
         imageIds = ret["image_ids"]
         return imageIds
 
-    def imageQueryFile(self, filePath):
-        return self.imageQueryData(self.loadFileData(filePath))
+    def imageQueryFile(self, index, filePath):
+        return self.imageQueryData(index, self.loadFileData(filePath))
 
-    def imageQueryData(self, imageData):
-        ret = self.request("index/searcher", "POST", imageData)
+    def imageQueryData(self, index, imageData):
+        ret = self.request("indexes/" + index + "/searcher", "POST", imageData)
         self.raiseExceptionIfNeeded(ret["type"])
         imageIds = ret["image_ids"]
         tags = ret["tags"]
@@ -120,6 +120,16 @@ class PastecConnection:
     def ping(self):
         s = json.dumps({"type" : "PING"})
         ret = self.request("", "POST", bytearray(s, "UTF-8"))
+        self.raiseExceptionIfNeeded(ret["type"])
+
+    def addIndex(self, index):
+        s = json.dumps({"index_name" : index})
+        ret = self.request("indexes", "POST", bytearray(s, "UTF-8"))
+        self.raiseExceptionIfNeeded(ret["type"])
+
+    def removeIndex(self, index):
+        s = json.dumps({"index_name" : index})
+        ret = self.request("indexes", "DELETE", bytearray(s, "UTF-8"))
         self.raiseExceptionIfNeeded(ret["type"])
 
     def raiseExceptionIfNeeded(self, val):
@@ -150,6 +160,12 @@ class PastecConnection:
             raise PastecException("Index not written.")
         elif val == "INDEX_TAGS_NOT_WRITTEN":
             raise PastecException("Index not written.")
+        elif val == "INDEX_UNKNOWN":
+            raise PastecException("Index unknown.")
+        elif val == "INDEX_ALREADY_EXISTING":
+            raise PastecException("Index already existing.")
+        elif val == "INDEX_NAME_TOO_LONG":
+            raise PastecException("Index name too long.")
 
     def loadFileData(self, filePath):
         fd = open(filePath, "rb")

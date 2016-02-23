@@ -32,6 +32,7 @@ enum MessagesOut
 {
     OK =                                0x10010000,
     ERROR_GENERIC =                     0x10020000,
+    ERROR_MEMORY =                      0x10020010,
     MISFORMATTED_REQUEST =              0x10020100,
     AUTHENTIFICATION_ERROR =            0x10020200,
     PONG =                              0x10030000,
@@ -58,6 +59,9 @@ enum MessagesOut
     INDEX_TAGS_NOT_WRITTEN =            0x10060410,
     INDEX_CLEARED =                     0x10060500,
     INDEX_IMAGE_IDS =                   0x10060600,
+    INDEX_UNKNOWN =                     0x10060700,
+    INDEX_ALREADY_EXISTING =            0x10060800,
+    INDEX_NAME_TOO_LONG =               0x10060900,
 
     SEARCH_RESULTS =                    0x10070100,
 };
@@ -78,6 +82,7 @@ public:
         {
             case OK: s = "OK"; break;
             case ERROR_GENERIC: s = "ERROR_GENERIC"; break;
+            case ERROR_MEMORY: s = "ERROR_MEMORY"; break;
             case MISFORMATTED_REQUEST: s = "MISFORMATTED_REQUEST"; break;
             case AUTHENTIFICATION_ERROR: s = "AUTHENTIFICATION_ERROR"; break;
             case PONG: s = "PONG"; break;
@@ -104,6 +109,9 @@ public:
             case INDEX_TAGS_NOT_WRITTEN: s = "INDEX_TAGS_NOT_WRITTEN"; break;
             case INDEX_CLEARED: s = "INDEX_CLEARED"; break;
             case INDEX_IMAGE_IDS: s = "INDEX_IMAGE_IDS"; break;
+            case INDEX_UNKNOWN: s = "INDEX_UNKNOWN"; break;
+            case INDEX_ALREADY_EXISTING: s = "INDEX_ALREADY_EXISTING"; break;
+            case INDEX_NAME_TOO_LONG: s = "INDEX_NAME_TOO_LONG"; break;
 
             case SEARCH_RESULTS: s = "SEARCH_RESULTS"; break;
             default: break;

@@ -26,7 +26,7 @@
 
 class FeatureExtractor;
 class Searcher;
-class Index;
+class IndexCollection;
 
 using namespace std;
 
@@ -39,7 +39,7 @@ class RequestHandler
 {
 public:
     RequestHandler(FeatureExtractor *featureExtractor,
-                   Searcher *imageSearcher, Index *index, string authKey);
+                   Searcher *imageSearcher, IndexCollection *indexCol, string authKey);
     void handleRequest(ConnectionInfo &conInfo);
 
 private:
@@ -50,7 +50,7 @@ private:
 
     FeatureExtractor *featureExtractor;
     Searcher *imageSearcher;
-    Index *index;
+    IndexCollection *indexCol;
 
     string authKey;
 };

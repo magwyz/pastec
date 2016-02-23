@@ -42,19 +42,18 @@ class ClientConnection;
 class ORBSearcher : public Searcher
 {
 public:
-    ORBSearcher(ORBIndex *index, ORBWordIndex *wordIndex);
+    ORBSearcher(ORBWordIndex *wordIndex);
     virtual ~ORBSearcher();
-    u_int32_t searchImage(SearchRequest &request);
-    u_int32_t searchSimilar(SearchRequest &request);
+    u_int32_t searchImage(Index *ind, SearchRequest &request);
+    u_int32_t searchSimilar(Index *ind, SearchRequest &request);
 
 private:
-    void returnResults(priority_queue<SearchResult> &rankedResults,
+    void returnResults(ORBIndex *index, priority_queue<SearchResult> &rankedResults,
                        SearchRequest &req, unsigned i_maxNbResults);
     unsigned long getTimeDiff(const timeval t1, const timeval t2) const;
-    u_int32_t processSimilar(SearchRequest &request,
+    u_int32_t processSimilar(ORBIndex *index, SearchRequest &request,
                              std::unordered_map<u_int32_t, list<Hit> > imageReqHits);
 
-    ORBIndex *index;
     ORBWordIndex *wordIndex;
     ImageReranker reranker;
 };

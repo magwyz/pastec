@@ -31,6 +31,7 @@ using namespace std;
 using namespace cv;
 
 class ClientConnection;
+class Index;
 
 
 struct SearchRequest
@@ -48,8 +49,8 @@ struct SearchRequest
 class Searcher
 {
 public:
-    virtual u_int32_t searchImage(SearchRequest &request) = 0;
-    virtual u_int32_t searchSimilar(SearchRequest &request) = 0;
+    virtual u_int32_t searchImage(Index *index, SearchRequest &request) = 0;
+    virtual u_int32_t searchSimilar(Index *index, SearchRequest &request) = 0;
 };
 
 #endif // PASTEC_SEARCHER_H

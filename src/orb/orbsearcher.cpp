@@ -45,8 +45,8 @@
 using namespace std::tr1;
 #endif
 
-ORBSearcher::ORBSearcher(ORBIndex *index, ORBWordIndex *wordIndex)
-    : index(index), wordIndex(wordIndex)
+ORBSearcher::ORBSearcher(ORBWordIndex *wordIndex)
+    : wordIndex(wordIndex)
 { }
 
 
@@ -108,8 +108,9 @@ public:
  * @brief Processed a search request.
  * @param request the request to proceed.
  */
-u_int32_t ORBSearcher::searchImage(SearchRequest &request)
+u_int32_t ORBSearcher::searchImage(Index *ind, SearchRequest &request)
 {
+    ORBIndex *index = static_cast<ORBIndex *>(ind);
     timeval t[3];
     gettimeofday(&t[0], NULL);
 
@@ -170,7 +171,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     gettimeofday(&t[2], NULL);
     cout << "time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
 
-    return processSimilar(request, imageReqHits);
+    return processSimilar(index, request, imageReqHits);
 }
 
 
@@ -178,8 +179,9 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
  * @brief Processed a similarity request.
  * @param request the request to proceed.
  */
-u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
+u_int32_t ORBSearcher::searchSimilar(Index *ind, SearchRequest &request)
 {
+    ORBIndex *index = static_cast<ORBIndex *>(ind);
     timeval t[2];
     gettimeofday(&t[0], NULL);
 
@@ -195,11 +197,11 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
     gettimeofday(&t[1], NULL);
     cout << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
 
-    return processSimilar(request, imageReqHits);
+    return processSimilar(index, request, imageReqHits);
 }
 
 
-u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
+u_int32_t ORBSearcher::processSimilar(ORBIndex *index, SearchRequest &request,
         std::unordered_map<u_int32_t, list<Hit> > imageReqHits)
 {
     timeval t[7];
@@ -284,7 +286,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     cout << "time: " << getTimeDiff(t[5], t[6]) << " ms." << endl;
     cout << "Returning the results. " << endl;
 
-    returnResults(rerankedResults, request, 100);
+    returnResults(index, rerankedResults, request, 100);
 
     return SEARCH_RESULTS;
 }
@@ -296,8 +298,8 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
  * @param req the received search request.
  * @param i_maxNbResults the maximum number of results returned.
  */
-void ORBSearcher::returnResults(priority_queue<SearchResult> &rankedResults,
-                                  SearchRequest &req, unsigned i_maxNbResults)
+void ORBSearcher::returnResults(ORBIndex *index, priority_queue<SearchResult> &rankedResults,
+                                SearchRequest &req, unsigned i_maxNbResults)
 {
     list<u_int32_t> imageIds;
 

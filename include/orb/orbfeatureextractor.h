@@ -28,7 +28,7 @@
 
 #include <opencv2/core/core.hpp>
 
-#include <orbindex.h>
+#include <orbindexcollection.h>
 #include <orbwordindex.h>
 #include <featureextractor.h>
 
@@ -42,14 +42,13 @@ using namespace std;
 class ORBFeatureExtractor : public FeatureExtractor
 {
 public:
-    ORBFeatureExtractor(ORBIndex *index, ORBWordIndex *wordIndex);
+    ORBFeatureExtractor(ORBWordIndex *wordIndex);
     virtual ~ORBFeatureExtractor() {}
 
-    u_int32_t processNewImage(unsigned i_imageId, unsigned i_imgSize,
+    u_int32_t processNewImage(Index *index, unsigned i_imageId, unsigned i_imgSize,
                               char *p_imgData, unsigned &i_nbFeaturesExtracted);
 
 private:
-    ORBIndex *index;
     ORBWordIndex *wordIndex;
 };
 

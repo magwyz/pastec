@@ -32,16 +32,16 @@
 #include <messages.h>
 #include <featureextractor.h>
 #include <searcher.h>
-#include <index.h>
+#include <indexcollection.h>
 
 #include <imageloader.h>
 #include <opencv2/highgui/highgui.hpp>
 
 
 RequestHandler::RequestHandler(FeatureExtractor *featureExtractor,
-               Searcher *imageSearcher, Index *index, string authKey)
+               Searcher *imageSearcher, IndexCollection *indexCol, string authKey)
     : featureExtractor(featureExtractor), imageSearcher(imageSearcher),
-      index(index), authKey(authKey)
+      indexCol(indexCol), authKey(authKey)
 { }
 
 
@@ -99,6 +99,10 @@ bool RequestHandler::testURIWithPattern(vector<string> parsedURI, string p_patte
             if (n < 0)
                 return false;
         }
+        else if (p_pattern[i] == "INDEX_NAME")
+        {
+            1;
+        }
         else if (p_pattern[i] != parsedURI[i])
             return false;
     }
@@ -120,14 +124,17 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
 {
     vector<string> parsedURI = parseURI(conInfo.url);
 
-    string p_image[] = {"index", "images", "IDENTIFIER", ""};
-    string p_tag[] = {"index", "images", "IDENTIFIER", "tag", ""};
-    string p_searchImage[] = {"index", "searcher", ""};
-    string p_ioIndex[] = {"index", "io", ""};
-    string p_imageIds[] = {"index", "imageIds", ""};
+    string p_image[] = {"indexes", "INDEX_NAME", "images", "IDENTIFIER", ""};
+    string p_tag[] = {"indexes", "INDEX_NAME", "images", "IDENTIFIER", "tag", ""};
+    string p_searchImage[] = {"indexes", "INDEX_NAME", "searcher", ""};
+    string p_ioIndex[] = {"indexes", "INDEX_NAME", "io", ""};
+    string p_imageIds[] = {"indexes", "INDEX_NAME", "imageIds", ""};
+    string p_indexes[] = {"indexes", ""};
     string p_root[] = {""};
 
     Json::Value ret;
+    Index *index;
+    u_int32_t i_ret;
     conInfo.answerCode = MHD_HTTP_OK;
 
     if (authKey != "" && conInfo.authKey != authKey) {
@@ -137,155 +144,181 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_image)
         && conInfo.connectionType == PUT)
     {
-        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
+        i_ret = indexCol->get(parsedURI[1], &index);
+        u_int32_t i_imageId = atoi(parsedURI[3].c_str());
 
-        unsigned i_nbFeaturesExtracted;
-        u_int32_t i_ret = featureExtractor->processNewImage(
-            i_imageId, conInfo.uploadedData.size(), conInfo.uploadedData.data(),
-            i_nbFeaturesExtracted);
+        if (i_ret == OK)
+        {
+            unsigned i_nbFeaturesExtracted;
+            i_ret = featureExtractor->processNewImage(index,
+                i_imageId, conInfo.uploadedData.size(), conInfo.uploadedData.data(),
+                i_nbFeaturesExtracted);
 
+            ret["image_id"] = Json::Value(i_imageId);
+            if (i_ret == IMAGE_ADDED)
+                ret["nb_features_extracted"] = Json::Value(i_nbFeaturesExtracted);
+        }
         ret["type"] = Converter::codeToString(i_ret);
-        ret["image_id"] = Json::Value(i_imageId);
-        if (i_ret == IMAGE_ADDED)
-            ret["nb_features_extracted"] = Json::Value(i_nbFeaturesExtracted);
     }
     else if (testURIWithPattern(parsedURI, p_image)
              && conInfo.connectionType == DELETE)
     {
-        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
+        i_ret = indexCol->get(parsedURI[1], &index);
+        u_int32_t i_imageId = atoi(parsedURI[3].c_str());
 
-        u_int32_t i_ret = index->removeImage(i_imageId);
-        ret["type"] = Converter::codeToString(i_ret);
+        if (i_ret == OK)
+        {
+            i_ret = index->removeImage(i_imageId);
+            ret["type"] = Converter::codeToString(i_ret);
+        }
         ret["image_id"] = Json::Value(i_imageId);
     }
     else if (testURIWithPattern(parsedURI, p_tag)
              && conInfo.connectionType == PUT)
     {
-        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
+        i_ret = indexCol->get(parsedURI[1], &index);
+        u_int32_t i_imageId = atoi(parsedURI[3].c_str());
 
         string dataStr(conInfo.uploadedData.begin(),
                        conInfo.uploadedData.end());
 
-        u_int32_t i_ret = index->addTag(i_imageId, dataStr);
+        if (i_ret == OK)
+            i_ret = index->addTag(i_imageId, dataStr);
 
         ret["type"] = Converter::codeToString(i_ret);
     }
     else if (testURIWithPattern(parsedURI, p_tag)
              && conInfo.connectionType == DELETE)
     {
-        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
+        i_ret = indexCol->get(parsedURI[1], &index);
+        u_int32_t i_imageId = atoi(parsedURI[3].c_str());
 
-        u_int32_t i_ret = index->removeTag(i_imageId);
+        if (i_ret == OK)
+            i_ret = index->removeTag(i_imageId);
 
         ret["type"] = Converter::codeToString(i_ret);
     }
     else if (testURIWithPattern(parsedURI, p_searchImage)
              && conInfo.connectionType == POST)
     {
-        SearchRequest req;
+        i_ret = indexCol->get(parsedURI[1], &index);
 
-        req.imageData = conInfo.uploadedData;
-        req.client = NULL;
-        u_int32_t i_ret = imageSearcher->searchImage(req);
-
-        ret["type"] = Converter::codeToString(i_ret);
-        if (i_ret == SEARCH_RESULTS)
+        if (i_ret == OK)
         {
-            // Return the image ids
-            Json::Value imageIds(Json::arrayValue);
-            for (unsigned i = 0; i < req.results.size(); ++i)
-                imageIds.append(req.results[i]);
-            ret["image_ids"] = imageIds;
+            SearchRequest req;
 
-            // Return the bounding rects
-            Json::Value boundingRects(Json::arrayValue);
-            for (unsigned i = 0; i < req.boundingRects.size(); ++i)
+            req.imageData = conInfo.uploadedData;
+            req.client = NULL;
+            u_int32_t i_ret = imageSearcher->searchImage(index, req);
+
+            ret["type"] = Converter::codeToString(i_ret);
+            if (i_ret == SEARCH_RESULTS)
             {
-                Rect r = req.boundingRects[i];
-                Json::Value rVal;
-                rVal["x"] = r.x; rVal["y"] = r.y;
-                rVal["width"] = r.width; rVal["height"] = r.height;
-                boundingRects.append(rVal);
+                // Return the image ids
+                Json::Value imageIds(Json::arrayValue);
+                for (unsigned i = 0; i < req.results.size(); ++i)
+                    imageIds.append(req.results[i]);
+                ret["image_ids"] = imageIds;
+
+                // Return the bounding rects
+                Json::Value boundingRects(Json::arrayValue);
+                for (unsigned i = 0; i < req.boundingRects.size(); ++i)
+                {
+                    Rect r = req.boundingRects[i];
+                    Json::Value rVal;
+                    rVal["x"] = r.x; rVal["y"] = r.y;
+                    rVal["width"] = r.width; rVal["height"] = r.height;
+                    boundingRects.append(rVal);
+                }
+                ret["bounding_rects"] = boundingRects;
+
+                // Return the scores
+                Json::Value scores(Json::arrayValue);
+                for (unsigned i = 0; i < req.scores.size(); ++i)
+                    scores.append(req.scores[i]);
+                ret["scores"] = scores;
+
+                // Return the tags
+                Json::Value tags(Json::arrayValue);
+                for (unsigned i = 0; i < req.tags.size(); ++i)
+                    tags.append(req.tags[i]);
+                ret["tags"] = tags;
             }
-            ret["bounding_rects"] = boundingRects;
-
-            // Return the scores
-            Json::Value scores(Json::arrayValue);
-            for (unsigned i = 0; i < req.scores.size(); ++i)
-                scores.append(req.scores[i]);
-            ret["scores"] = scores;
-
-            // Return the tags
-            Json::Value tags(Json::arrayValue);
-            for (unsigned i = 0; i < req.tags.size(); ++i)
-                tags.append(req.tags[i]);
-            ret["tags"] = tags;
         }
     }
     else if (testURIWithPattern(parsedURI, p_image)
         && conInfo.connectionType == GET)
     {
-        SearchRequest req;
+        i_ret = indexCol->get(parsedURI[1], &index);
 
-        req.imageId = atoi(parsedURI[2].c_str());
-        req.client = NULL;
-        u_int32_t i_ret = imageSearcher->searchSimilar(req);
-
-        ret["type"] = Converter::codeToString(i_ret);
-
-        if (i_ret == SEARCH_RESULTS)
+        if (i_ret == OK)
         {
-            // Return the image ids
-            Json::Value imageIds(Json::arrayValue);
-            for (unsigned i = 0; i < req.results.size(); ++i)
-                imageIds.append(req.results[i]);
-            ret["image_ids"] = imageIds;
+            SearchRequest req;
 
-            // Return the bounding rects
-            Json::Value boundingRects(Json::arrayValue);
-            for (unsigned i = 0; i < req.boundingRects.size(); ++i)
+            req.imageId = atoi(parsedURI[3].c_str());
+            req.client = NULL;
+            i_ret = imageSearcher->searchSimilar(index, req);
+
+            ret["type"] = Converter::codeToString(i_ret);
+
+            if (i_ret == SEARCH_RESULTS)
             {
-                Rect r = req.boundingRects[i];
-                Json::Value rVal;
-                rVal["x"] = r.x; rVal["y"] = r.y;
-                rVal["width"] = r.width; rVal["height"] = r.height;
-                boundingRects.append(rVal);
+                // Return the image ids
+                Json::Value imageIds(Json::arrayValue);
+                for (unsigned i = 0; i < req.results.size(); ++i)
+                    imageIds.append(req.results[i]);
+                ret["image_ids"] = imageIds;
+
+                // Return the bounding rects
+                Json::Value boundingRects(Json::arrayValue);
+                for (unsigned i = 0; i < req.boundingRects.size(); ++i)
+                {
+                    Rect r = req.boundingRects[i];
+                    Json::Value rVal;
+                    rVal["x"] = r.x; rVal["y"] = r.y;
+                    rVal["width"] = r.width; rVal["height"] = r.height;
+                    boundingRects.append(rVal);
+                }
+                ret["bounding_rects"] = boundingRects;
+
+                // Return the scores
+                Json::Value scores(Json::arrayValue);
+                for (unsigned i = 0; i < req.scores.size(); ++i)
+                    scores.append(req.scores[i]);
+                ret["scores"] = scores;
+
+                // Return the tags
+                Json::Value tags(Json::arrayValue);
+                for (unsigned i = 0; i < req.tags.size(); ++i)
+                    tags.append(req.tags[i]);
+                ret["tags"] = tags;
             }
-            ret["bounding_rects"] = boundingRects;
-
-            // Return the scores
-            Json::Value scores(Json::arrayValue);
-            for (unsigned i = 0; i < req.scores.size(); ++i)
-                scores.append(req.scores[i]);
-            ret["scores"] = scores;
-
-            // Return the tags
-            Json::Value tags(Json::arrayValue);
-            for (unsigned i = 0; i < req.tags.size(); ++i)
-                tags.append(req.tags[i]);
-            ret["tags"] = tags;
         }
     }
     else if (testURIWithPattern(parsedURI, p_ioIndex)
              && conInfo.connectionType == POST)
     {
-        string dataStr(conInfo.uploadedData.begin(),
-                       conInfo.uploadedData.end());
+        i_ret = indexCol->get(parsedURI[1], &index);
 
-        Json::Value data = StringToJson(dataStr);
-        u_int32_t i_ret;
-        if (data["type"] == "LOAD")
-            i_ret = index->load(data["index_path"].asString());
-        else if (data["type"] == "WRITE")
-            i_ret = index->write(data["index_path"].asString());
-        else if (data["type"] == "LOAD_TAGS")
-            i_ret = index->loadTags(data["index_tags_path"].asString());
-        else if (data["type"] == "WRITE_TAGS")
-            i_ret = index->writeTags(data["index_tags_path"].asString());
-        else if (data["type"] == "CLEAR")
-            i_ret = index->clear();
-        else
-            i_ret = MISFORMATTED_REQUEST;
+        if (i_ret == OK)
+        {
+            string dataStr(conInfo.uploadedData.begin(),
+                           conInfo.uploadedData.end());
+
+            Json::Value data = StringToJson(dataStr);
+            if (data["type"] == "LOAD")
+                i_ret = index->load(data["index_path"].asString());
+            else if (data["type"] == "WRITE")
+                i_ret = index->write(data["index_path"].asString());
+            else if (data["type"] == "LOAD_TAGS")
+                i_ret = index->loadTags(data["index_tags_path"].asString());
+            else if (data["type"] == "WRITE_TAGS")
+                i_ret = index->writeTags(data["index_tags_path"].asString());
+            else if (data["type"] == "CLEAR")
+                i_ret = index->clear();
+            else
+                i_ret = MISFORMATTED_REQUEST;
+        }
 
         ret["type"] = Converter::codeToString(i_ret);
     }
@@ -293,7 +326,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
              && conInfo.connectionType == GET)
     {
         vector<u_int32_t> imageIds;
-        u_int32_t i_ret = index->getImageIds(imageIds);
+        i_ret = index->getImageIds(imageIds);
 
         ret["type"] = Converter::codeToString(i_ret);
 
@@ -310,7 +343,6 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
                        conInfo.uploadedData.end());
 
         Json::Value data = StringToJson(dataStr);
-        u_int32_t i_ret;
         if (data["type"] == "PING")
         {
             cout << "Ping received." << endl;
@@ -318,6 +350,30 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
         }
         else
             i_ret = MISFORMATTED_REQUEST;
+
+        ret["type"] = Converter::codeToString(i_ret);
+    }
+    else if (testURIWithPattern(parsedURI, p_indexes)
+             && conInfo.connectionType == POST)
+    {
+        string dataStr(conInfo.uploadedData.begin(),
+                       conInfo.uploadedData.end());
+
+        Json::Value data = StringToJson(dataStr);
+        if (data["index_name"] != "")
+            i_ret = indexCol->addIndex(data["index_name"].asString());
+
+        ret["type"] = Converter::codeToString(i_ret);
+    }
+    else if (testURIWithPattern(parsedURI, p_indexes)
+             && conInfo.connectionType == DELETE)
+    {
+        string dataStr(conInfo.uploadedData.begin(),
+                       conInfo.uploadedData.end());
+
+        Json::Value data = StringToJson(dataStr);
+        if (data["index_name"] != "")
+            i_ret = indexCol->removeIndex(data["index_name"].asString());
 
         ret["type"] = Converter::codeToString(i_ret);
     }

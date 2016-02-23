@@ -11,6 +11,7 @@ set(SOURCES      src/main.cpp
                  src/requesthandler.cpp
                  src/orb/orbfeatureextractor.cpp
                  src/orb/orbindex.cpp
+                 src/orb/orbindexcollection.cpp
                  src/orb/orbsearcher.cpp
                  src/orb/orbwordindex.cpp)
 
@@ -22,9 +23,11 @@ set(HEADERS      include/thread.h
                  include/backwardindexreaderaccess.h
                  include/imageloader.h
                  include/index.h
+                 include/indexcollection.h
                  include/featureextractor.h
                  include/orb/orbfeatureextractor.h
                  include/orb/orbindex.h
+                 include/orb/orbindexcollection.h
                  include/orb/orbsearcher.h
                  include/orb/orbwordindex.h
                  include/searcher.h

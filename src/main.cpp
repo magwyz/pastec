@@ -24,6 +24,7 @@
 
 #include <httpserver.h>
 #include <requesthandler.h>
+#include <orb/orbindexcollection.h>
 #include <orb/orbfeatureextractor.h>
 #include <orb/orbsearcher.h>
 #include <orb/orbwordindex.h>
@@ -108,11 +109,11 @@ int main(int argc, char** argv)
         ++i;
     }
 
-    Index *index = new ORBIndex(indexPath, buildForwardIndex);
+    IndexCollection *indexCol = new ORBIndexCollection();
     ORBWordIndex *wordIndex = new ORBWordIndex(visualWordPath);
-    FeatureExtractor *ife = new ORBFeatureExtractor((ORBIndex *)index, wordIndex);
-    Searcher *is = new ORBSearcher((ORBIndex *)index, wordIndex);
-    RequestHandler *rh = new RequestHandler(ife, is, index, authKey);
+    FeatureExtractor *ife = new ORBFeatureExtractor(wordIndex);
+    Searcher *is = new ORBSearcher(wordIndex);
+    RequestHandler *rh = new RequestHandler(ife, is, indexCol, authKey);
     s = new HTTPServer(rh, i_port, https);
 
     signal(SIGHUP, intHandler);
@@ -125,7 +126,7 @@ int main(int argc, char** argv)
     delete s;
     delete (ORBSearcher *)is;
     delete (ORBFeatureExtractor *)ife;
-    delete (ORBIndex *)index;
+    delete (ORBIndexCollection *)indexCol;
 
     return 0;
 }
