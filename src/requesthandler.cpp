@@ -129,7 +129,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     string p_searchImage[] = {"indexes", "INDEX_NAME", "searcher", ""};
     string p_ioIndex[] = {"indexes", "INDEX_NAME", "io", ""};
     string p_imageIds[] = {"indexes", "INDEX_NAME", "imageIds", ""};
-    string p_indexes[] = {"indexes", ""};
+    string p_indexes[] = {"indexes", "INDEX_NAME", ""};
     string p_root[] = {""};
 
     Json::Value ret;
@@ -356,25 +356,13 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_indexes)
              && conInfo.connectionType == POST)
     {
-        string dataStr(conInfo.uploadedData.begin(),
-                       conInfo.uploadedData.end());
-
-        Json::Value data = StringToJson(dataStr);
-        if (data["index_name"] != "")
-            i_ret = indexCol->addIndex(data["index_name"].asString());
-
+        i_ret = indexCol->addIndex(parsedURI[1]);
         ret["type"] = Converter::codeToString(i_ret);
     }
     else if (testURIWithPattern(parsedURI, p_indexes)
              && conInfo.connectionType == DELETE)
     {
-        string dataStr(conInfo.uploadedData.begin(),
-                       conInfo.uploadedData.end());
-
-        Json::Value data = StringToJson(dataStr);
-        if (data["index_name"] != "")
-            i_ret = indexCol->removeIndex(data["index_name"].asString());
-
+        i_ret = indexCol->removeIndex(parsedURI[1]);
         ret["type"] = Converter::codeToString(i_ret);
     }
     else

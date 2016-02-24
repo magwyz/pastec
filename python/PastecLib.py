@@ -123,13 +123,12 @@ class PastecConnection:
         self.raiseExceptionIfNeeded(ret["type"])
 
     def addIndex(self, index):
-        s = json.dumps({"index_name" : index})
-        ret = self.request("indexes", "POST", bytearray(s, "UTF-8"))
+        ret = self.request("indexes/" + index, "POST")
         self.raiseExceptionIfNeeded(ret["type"])
 
     def removeIndex(self, index):
         s = json.dumps({"index_name" : index})
-        ret = self.request("indexes", "DELETE", bytearray(s, "UTF-8"))
+        ret = self.request("indexes/" + index, "DELETE")
         self.raiseExceptionIfNeeded(ret["type"])
 
     def raiseExceptionIfNeeded(self, val):
