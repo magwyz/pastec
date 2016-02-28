@@ -213,37 +213,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
 
             ret["type"] = Converter::codeToString(i_ret);
             if (i_ret == SEARCH_RESULTS)
-            {
-                // Return the image ids
-                Json::Value imageIds(Json::arrayValue);
-                for (unsigned i = 0; i < req.results.size(); ++i)
-                    imageIds.append(req.results[i]);
-                ret["image_ids"] = imageIds;
-
-                // Return the bounding rects
-                Json::Value boundingRects(Json::arrayValue);
-                for (unsigned i = 0; i < req.boundingRects.size(); ++i)
-                {
-                    Rect r = req.boundingRects[i];
-                    Json::Value rVal;
-                    rVal["x"] = r.x; rVal["y"] = r.y;
-                    rVal["width"] = r.width; rVal["height"] = r.height;
-                    boundingRects.append(rVal);
-                }
-                ret["bounding_rects"] = boundingRects;
-
-                // Return the scores
-                Json::Value scores(Json::arrayValue);
-                for (unsigned i = 0; i < req.scores.size(); ++i)
-                    scores.append(req.scores[i]);
-                ret["scores"] = scores;
-
-                // Return the tags
-                Json::Value tags(Json::arrayValue);
-                for (unsigned i = 0; i < req.tags.size(); ++i)
-                    tags.append(req.tags[i]);
-                ret["tags"] = tags;
-            }
+                ret["results"] = searchResult(req);
         }
     }
     else if (testURIWithPattern(parsedURI, p_image)
@@ -262,37 +232,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
             ret["type"] = Converter::codeToString(i_ret);
 
             if (i_ret == SEARCH_RESULTS)
-            {
-                // Return the image ids
-                Json::Value imageIds(Json::arrayValue);
-                for (unsigned i = 0; i < req.results.size(); ++i)
-                    imageIds.append(req.results[i]);
-                ret["image_ids"] = imageIds;
-
-                // Return the bounding rects
-                Json::Value boundingRects(Json::arrayValue);
-                for (unsigned i = 0; i < req.boundingRects.size(); ++i)
-                {
-                    Rect r = req.boundingRects[i];
-                    Json::Value rVal;
-                    rVal["x"] = r.x; rVal["y"] = r.y;
-                    rVal["width"] = r.width; rVal["height"] = r.height;
-                    boundingRects.append(rVal);
-                }
-                ret["bounding_rects"] = boundingRects;
-
-                // Return the scores
-                Json::Value scores(Json::arrayValue);
-                for (unsigned i = 0; i < req.scores.size(); ++i)
-                    scores.append(req.scores[i]);
-                ret["scores"] = scores;
-
-                // Return the tags
-                Json::Value tags(Json::arrayValue);
-                for (unsigned i = 0; i < req.tags.size(); ++i)
-                    tags.append(req.tags[i]);
-                ret["tags"] = tags;
-            }
+                ret["results"] = searchResult(req);
         }
     }
     else if (testURIWithPattern(parsedURI, p_ioIndex)
@@ -372,6 +312,41 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     }
 
     conInfo.answerString = JsonToString(ret);
+}
+
+
+/**
+ * @brief Build the JSON search result
+ * @param req the search request
+ * @return the built JSON
+ */
+Json::Value RequestHandler::searchResult(SearchRequest &req)
+{
+    Json::Value ret(Json::arrayValue);
+
+    assert(req.results.size() == req.boundingRects.size());
+    assert(req.results.size() == req.scores.size());
+    assert(req.results.size() == req.tags.size());
+
+    for (unsigned i = 0; i < req.results.size(); ++i)
+    {
+        Json::Value res;
+        res["image_id"] = req.results[i];
+
+        Rect r = req.boundingRects[i];
+        Json::Value rVal;
+        rVal["x"] = r.x; rVal["y"] = r.y;
+        rVal["width"] = r.width; rVal["height"] = r.height;
+        res["bounding_rect"] = rVal;
+
+        res["score"] = req.scores[i];
+
+        res["tag"] = req.tags[i];
+
+        ret.append(res);
+    }
+
+    return ret;
 }
 
 

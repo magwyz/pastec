@@ -34,6 +34,8 @@ namespace Json {
     class Value;
 }
 
+class SearchRequest;
+
 
 class RequestHandler
 {
@@ -45,6 +47,7 @@ public:
 private:
     vector<string> parseURI(string uri);
     bool testURIWithPattern(vector<string> parsedURI, string p_pattern[]);
+    Json::Value searchResult(SearchRequest &req);
     string JsonToString(Json::Value data);
     Json::Value StringToJson(string str);
 

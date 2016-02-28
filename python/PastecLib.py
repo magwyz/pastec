@@ -108,14 +108,7 @@ class PastecConnection:
     def imageQueryData(self, index, imageData):
         ret = self.request("indexes/" + index + "/searcher", "POST", imageData)
         self.raiseExceptionIfNeeded(ret["type"])
-        imageIds = ret["image_ids"]
-        tags = ret["tags"]
-        res = []
-        if len(imageIds) != len(tags):
-            raise PastecException("Image ids and tags arrays have different sizes.")
-        for i in range(len(imageIds)):
-            res += [(imageIds[i], tags[i])]
-        return res
+        return ret["results"]
 
     def ping(self):
         s = json.dumps({"type" : "PING"})
