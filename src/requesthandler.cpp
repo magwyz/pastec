@@ -133,7 +133,6 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     string p_root[] = {""};
 
     Json::Value ret;
-    Index *index;
     u_int32_t i_ret;
     conInfo.answerCode = MHD_HTTP_OK;
 
@@ -144,6 +143,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_image)
         && conInfo.connectionType == PUT)
     {
+        Index *index;
         i_ret = indexCol->get(parsedURI[1], &index);
         u_int32_t i_imageId = atoi(parsedURI[3].c_str());
 
@@ -163,6 +163,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_image)
              && conInfo.connectionType == DELETE)
     {
+        Index *index;
         i_ret = indexCol->get(parsedURI[1], &index);
         u_int32_t i_imageId = atoi(parsedURI[3].c_str());
 
@@ -176,6 +177,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_tag)
              && conInfo.connectionType == PUT)
     {
+        Index *index;
         i_ret = indexCol->get(parsedURI[1], &index);
         u_int32_t i_imageId = atoi(parsedURI[3].c_str());
 
@@ -190,6 +192,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_tag)
              && conInfo.connectionType == DELETE)
     {
+        Index *index;
         i_ret = indexCol->get(parsedURI[1], &index);
         u_int32_t i_imageId = atoi(parsedURI[3].c_str());
 
@@ -201,6 +204,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_searchImage)
              && conInfo.connectionType == POST)
     {
+        Index *index;
         i_ret = indexCol->get(parsedURI[1], &index);
 
         if (i_ret == OK)
@@ -219,6 +223,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_image)
         && conInfo.connectionType == GET)
     {
+        Index *index;
         i_ret = indexCol->get(parsedURI[1], &index);
 
         if (i_ret == OK)
@@ -238,6 +243,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_ioIndex)
              && conInfo.connectionType == POST)
     {
+        Index *index;
         i_ret = indexCol->get(parsedURI[1], &index);
 
         if (i_ret == OK)
@@ -265,16 +271,22 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_imageIds)
              && conInfo.connectionType == GET)
     {
-        vector<u_int32_t> imageIds;
-        i_ret = index->getImageIds(imageIds);
+        Index *index;
+        i_ret = indexCol->get(parsedURI[1], &index);
+
+        if (i_ret == OK)
+        {
+            vector<u_int32_t> imageIds;
+            i_ret = index->getImageIds(imageIds);
+
+            // Return the image ids
+            Json::Value imageIdsVal(Json::arrayValue);
+            for (unsigned i = 0; i < imageIds.size(); ++i)
+                imageIdsVal.append(imageIds[i]);
+            ret["image_ids"] = imageIdsVal;
+        }
 
         ret["type"] = Converter::codeToString(i_ret);
-
-        // Return the image ids
-        Json::Value imageIdsVal(Json::arrayValue);
-        for (unsigned i = 0; i < imageIds.size(); ++i)
-            imageIdsVal.append(imageIds[i]);
-        ret["image_ids"] = imageIdsVal;
     }
     else if (testURIWithPattern(parsedURI, p_root)
              && conInfo.connectionType == POST)
