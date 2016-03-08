@@ -75,14 +75,26 @@ u_int32_t ImageLoader::loadImage(unsigned i_imgSize, char *p_imgData, Mat &img)
     }
 
 #if 1
-    int min_width = getenv("PASTEC_MIN_WIDTH") == NULL ? 150 : atoi(getenv("PASTEC_MIN_WIDTH"));
-    int min_height = getenv("PASTEC_MIN_HEIGHT") == NULL ? 150 : atoi(getenv("PASTEC_MIN_HEIGHT"));
-    if (i_imgWidth < min_width
-        || i_imgHeight < min_height)
+
+    if (i_imgWidth < 150
+        || i_imgHeight < 150)
     {
-        cout << "Image too small." << endl;
-        return IMAGE_SIZE_TOO_SMALL;
+        cout << "Image too small, resizing." << endl;
+        Size size;
+        if (i_imgWidth < i_imgHeight)
+        {
+            size.width = 150;
+            size.height = (float)i_imgHeight / i_imgWidth * 150;
+        }
+        else
+        {
+            size.width = (float)i_imgWidth / i_imgHeight * 150;
+            size.height = 150;
+        }
+        resize(img, img, size);
+        return OK;
     }
+    
 #endif
 
     return OK;
