@@ -121,7 +121,7 @@ u_int32_t ORBIndex::addImage(unsigned i_imageId, list<HitForward> hitList)
     for (list<HitForward>::iterator it = hitList.begin(); it != hitList.end(); ++it)
     {
         HitForward hitFor = *it;
-        assert(i_imageId = hitFor.i_imageId);
+        assert(i_imageId == hitFor.i_imageId);
         Hit hitBack;
         hitBack.i_imageId = hitFor.i_imageId;
         hitBack.i_angle = hitFor.i_angle;
