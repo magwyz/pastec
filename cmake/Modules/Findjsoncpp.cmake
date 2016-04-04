@@ -9,9 +9,9 @@ find_package(PkgConfig)
 pkg_check_modules(PC_LIBJSONCPP QUIET libjsoncpp)
 set(LIBJSONCPP_DEFINITIONS ${PC_LIBJSONCPP_CFLAGS_OTHER})
 
-find_path(LIBJSONCPP_INCLUDE_DIR json.h
+find_path(LIBJSONCPP_INCLUDE_DIR json/features.h
           HINTS ${PC_LIBJSONCPP_INCLUDEDIR} ${PC_LIBJSONCPP_INCLUDE_DIRS}
-          PATH_SUFFIXES libjsoncpp)
+          PATH_SUFFIXES jsoncpp)
 
 find_library(LIBJSONCPP_LIBRARY jsoncpp
              HINTS ${PC_LIBJSONCPP_LIBDIR} ${PC_LIBJSONCPP_LIBRARY_DIRS} )
