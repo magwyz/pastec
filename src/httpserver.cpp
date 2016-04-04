@@ -105,7 +105,7 @@ int HTTPServer::run()
     if (daemon == NULL)
         return ERROR_GENERIC;
 
-    cout << "Ready to accept querries." << endl;
+    cout << "Ready to accept queries." << endl;
 
     pthread_mutex_lock(&stopMutex);
     while (!b_stop)
@@ -248,4 +248,3 @@ int HTTPServer::readAuthHeader(void *cls, enum MHD_ValueKind kind,
 
     return MHD_YES;
 }
-
