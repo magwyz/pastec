@@ -56,6 +56,7 @@ private:
 
     ORBWordIndex *wordIndex;
     ImageReranker reranker;
+    Ptr<ORB> orb;
 };
 
 #endif // PASTEC_IMAGESEARCHER_H
