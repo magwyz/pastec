@@ -37,8 +37,8 @@ ORBWordIndex::ORBWordIndex(string visualWordsPath)
 
     cvflann::Matrix<unsigned char> m_features
             ((unsigned char*)words->ptr<unsigned char>(0), words->rows, words->cols);
-    kdIndex = new cvflann::HierarchicalClusteringIndex<cvflann::Hamming<unsigned char> >
-            (m_features,cvflann::HierarchicalClusteringIndexParams(10, cvflann::FLANN_CENTERS_RANDOM, 8, 100));
+    kdIndex = new hci::HierarchicalClusteringIndex<cvflann::Hamming<unsigned char> >
+            (m_features,hci::HierarchicalClusteringIndexParams(10, cvflann::FLANN_CENTERS_RANDOM, 8, 100));
     kdIndex->buildIndex();
 }
 
