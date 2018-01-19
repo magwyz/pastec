@@ -72,7 +72,7 @@ u_int32_t ORBIndexCollection::get(const std::string indexName, Index ** const in
     std::unordered_map<string, ORBIndex*>::const_iterator indexIt
             = indexes.find(indexName);
 
-    cout << "indeName: " << indexName << endl;
+    cout << "Index name: " << indexName << endl;
     if (indexIt == indexes.end())
         return INDEX_UNKNOWN;
 
