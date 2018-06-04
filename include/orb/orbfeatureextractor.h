@@ -27,6 +27,7 @@
 #include <list>
 
 #include <opencv2/core/core.hpp>
+#include <opencv2/features2d/features2d.hpp>
 
 #include <orbindex.h>
 #include <orbwordindex.h>
@@ -51,6 +52,7 @@ public:
 private:
     ORBIndex *index;
     ORBWordIndex *wordIndex;
+    Ptr<ORB> orb;
 };
 
 #endif // PASTEC_ORBFEATUREEXTRACTOR_H

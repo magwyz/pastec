@@ -46,7 +46,7 @@ using namespace std::tr1;
 #endif
 
 ORBSearcher::ORBSearcher(ORBIndex *index, ORBWordIndex *wordIndex)
-    : index(index), wordIndex(wordIndex)
+    : index(index), wordIndex(wordIndex), orb(ORB::create(2000, 1.02, 100))
 { }
 
 
@@ -124,7 +124,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     vector<KeyPoint> keypoints;
     Mat descriptors;
 
-    ORB(2000, 1.02, 100)(img, noArray(), keypoints, descriptors);
+    orb->detectAndCompute(img, noArray(), keypoints, descriptors);
 
     gettimeofday(&t[1], NULL);
 

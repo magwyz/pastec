@@ -25,7 +25,6 @@
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/features2d/features2d.hpp>
 
 #include <orbfeatureextractor.h>
 #include <messages.h>
@@ -33,7 +32,7 @@
 
 
 ORBFeatureExtractor::ORBFeatureExtractor(ORBIndex *index, ORBWordIndex *wordIndex)
-    : index(index), wordIndex(wordIndex)
+    : index(index), wordIndex(wordIndex), orb(ORB::create(2000, 1.02, 100))
 { }
 
 
@@ -50,7 +49,7 @@ u_int32_t ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_im
     vector<KeyPoint> keypoints;
     Mat descriptors;
 
-    ORB(2000, 1.02, 100)(img, noArray(), keypoints, descriptors);
+    orb->detectAndCompute(img, noArray(), keypoints, descriptors);
     i_nbFeaturesExtracted = keypoints.size();
 
     unsigned i_nbKeyPoints = 0;
