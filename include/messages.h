@@ -60,6 +60,8 @@ enum MessagesOut
     INDEX_IMAGE_IDS =                   0x10060600,
 
     SEARCH_RESULTS =                    0x10070100,
+
+    IMAGE_DOWNLOADER_HTTP_ERROR =       0x10080100,
 };
 
 
@@ -106,6 +108,9 @@ public:
             case INDEX_IMAGE_IDS: s = "INDEX_IMAGE_IDS"; break;
 
             case SEARCH_RESULTS: s = "SEARCH_RESULTS"; break;
+
+            case IMAGE_DOWNLOADER_HTTP_ERROR: s = "IMAGE_DOWNLOADER_HTTP_ERROR"; break;
+
             default: break;
         }
         return s;

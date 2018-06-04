@@ -9,6 +9,7 @@ set(SOURCES      src/main.cpp
                  src/imageloader.cpp
                  src/httpserver.cpp
                  src/requesthandler.cpp
+                 src/imagedownloader.cpp
                  src/orb/orbfeatureextractor.cpp
                  src/orb/orbindex.cpp
                  src/orb/orbsearcher.cpp
@@ -23,6 +24,7 @@ set(HEADERS      include/thread.h
                  include/imageloader.h
                  include/index.h
                  include/featureextractor.h
+                 include/imagedownloader.h
                  include/orb/orbfeatureextractor.h
                  include/orb/orbindex.h
                  include/orb/orbsearcher.h
@@ -42,6 +44,7 @@ find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(microhttpd REQUIRED)
 find_package(jsoncpp REQUIRED)
+find_package(CURL REQUIRED)
 
 add_executable(pastec ${SOURCES} ${HEADERS})
 
@@ -49,4 +52,5 @@ target_link_libraries(pastec ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(pastec ${OpenCV_LIBS})
 target_link_libraries(pastec ${LIBMICROHTTPD_LIBRARY})
 target_link_libraries(pastec ${LIBJSONCPP_LIBRARY})
+target_link_libraries(pastec ${CURL_LIBRARIES})
 

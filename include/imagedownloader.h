@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2014 Visualink
+ * Copyright (C) 2018 Adrien Maglo
  *
  * Authors: Adrien Maglo <adrien@visualink.io>
  *
@@ -19,43 +19,30 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef PASTEC_REQUESTHANDLER_H
-#define PASTEC_REQUESTHANDLER_H
+#ifndef IMAGEDOWNLOADER_H
+#define IMAGEDOWNLOADER_H
 
-#include <httpserver.h>
-#include <imagedownloader.h>
+#include <string>
+#include <vector>
 
-class FeatureExtractor;
-class Searcher;
-class Index;
+#include <curl/curl.h>
 
-using namespace std;
-
-namespace Json {
-    class Value;
-}
+//#define UNSAFE_HTTPS
 
 
-class RequestHandler
+class ImageDownloader
 {
 public:
-    RequestHandler(FeatureExtractor *featureExtractor,
-                   Searcher *imageSearcher, Index *index,
-                   ImageDownloader *imgDownloader, string authKey);
-    void handleRequest(ConnectionInfo &conInfo);
+    ImageDownloader();
+
+    bool canDownloadImage(std::string imgURL);
+    u_int32_t getImageData(std::string imgURL, std::vector<char> &imgData,
+                           long &responseCode);
 
 private:
-    vector<string> parseURI(string uri);
-    bool testURIWithPattern(vector<string> parsedURI, string p_pattern[]);
-    string JsonToString(Json::Value data);
-    Json::Value StringToJson(string str);
+    static size_t writeCallback(char *ptr, size_t size, size_t nmemb, void *userdata);
 
-    FeatureExtractor *featureExtractor;
-    Searcher *imageSearcher;
-    Index *index;
-    ImageDownloader *imgDownloader;
-
-    string authKey;
 };
 
-#endif // PASTEC_REQUESTHANDLER_H
+
+#endif // IMAGEDOWNLOADER_H
