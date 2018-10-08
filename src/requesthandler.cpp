@@ -21,12 +21,10 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <memory>
+#include <sstream>
 
-#ifndef __APPLE__
-#include <jsoncpp/json/json.h>
-#else
 #include <json/json.h>
-#endif
 
 #include <requesthandler.h>
 #include <messages.h>
@@ -384,8 +382,10 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
  */
 string RequestHandler::JsonToString(Json::Value data)
 {
-    Json::FastWriter writer;
-    return writer.write(data);
+    Json::StreamWriterBuilder builder;
+    builder["commentStyle"] = "None";
+    builder["indentation"] = "";
+    return  Json::writeString(builder, data);
 }
 
 
@@ -394,10 +394,13 @@ string RequestHandler::JsonToString(Json::Value data)
  * @param str the string
  * @return the converted JSON value.
  */
-Json::Value RequestHandler::StringToJson(string str)
+Json::Value RequestHandler::StringToJson(string inputStr)
 {
-    Json::Reader reader;
+    Json::CharReaderBuilder builder;
     Json::Value data;
-    reader.parse(str, data);
+    std::string errs;
+    std::stringstream ss;
+    ss.str(inputStr);
+    Json::parseFromStream(builder, ss, &data, &errs);
     return data;
 }
