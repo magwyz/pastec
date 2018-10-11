@@ -65,7 +65,10 @@ char *HTTPServer::loadFile(const char *filename)
         return NULL;
 
     if (!file.read(buffer, size))
+    {
+        delete[] buffer;
         return NULL;
+    }
 
     return buffer;
 }
