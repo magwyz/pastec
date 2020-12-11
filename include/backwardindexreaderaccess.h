@@ -134,7 +134,7 @@ public:
         i_curPos = pos;
     }
 
-    virtual void read(char *p_data, unsigned i_nbBytes)
+    virtual void read(u_char *p_data, unsigned i_nbBytes)
     {
         memcpy(p_data, p_indexData + i_curPos, i_nbBytes);
         i_curPos += i_nbBytes;
