@@ -31,7 +31,7 @@ using namespace cv;
 class ImageLoader
 {
 public:
-    static u_int32_t loadImage(unsigned i_imgSize, char *p_imgData, Mat &img);
+    static u_int32_t loadImage(unsigned i_imgSize, u_char *p_imgData, Mat &img);
 };
 
 #endif // PASTEC_IMAGELOADER_H

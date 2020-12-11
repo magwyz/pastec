@@ -40,7 +40,7 @@ bool ImageDownloader::canDownloadImage(std::string imgURL)
 }
 
 
-u_int32_t ImageDownloader::getImageData(std::string imgURL, std::vector<char> &imgData,
+u_int32_t ImageDownloader::getImageData(std::string imgURL, std::vector<u_char> &imgData,
                                         long &responseCode)
 {
     if (!canDownloadImage(imgURL))

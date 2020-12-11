@@ -153,7 +153,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
             string imgURL = data["url"].asString();
             if (imgDownloader->canDownloadImage(imgURL))
             {
-                std::vector<char> imgData;
+                std::vector<u_char> imgData;
                 long HTTPResponseCode;
                 i_ret = imgDownloader->getImageData(imgURL, imgData, HTTPResponseCode);
                 if (i_ret == OK)
@@ -219,7 +219,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
             string imgURL = data["url"].asString();
             if (imgDownloader->canDownloadImage(imgURL))
             {
-                std::vector<char> imgData;
+                std::vector<u_char> imgData;
                 long HTTPResponseCode;
                 i_ret = imgDownloader->getImageData(imgURL, imgData, HTTPResponseCode);
                 if (i_ret == OK)

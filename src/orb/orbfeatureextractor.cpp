@@ -37,7 +37,7 @@ ORBFeatureExtractor::ORBFeatureExtractor(ORBIndex *index, ORBWordIndex *wordInde
 
 
 u_int32_t ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_imgSize,
-                                               char *p_imgData, unsigned &i_nbFeaturesExtracted)
+                                               u_char *p_imgData, unsigned &i_nbFeaturesExtracted)
 {
     Mat img;
     u_int32_t i_ret = ImageLoader::loadImage(i_imgSize, p_imgData, img);

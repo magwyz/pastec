@@ -29,7 +29,7 @@ class FeatureExtractor
 {
 public:
     virtual u_int32_t processNewImage(unsigned i_imageId, unsigned i_imgSize,
-                                      char *p_imgData, unsigned &i_nbFeaturesExtracted) = 0;
+                                      u_char *p_imgData, unsigned &i_nbFeaturesExtracted) = 0;
 };
 
 #endif // PASTEC_FEATUREEXTRACTOR_H
