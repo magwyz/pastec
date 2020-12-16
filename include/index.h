@@ -47,6 +47,8 @@ public:
 
     virtual u_int32_t loadTags(string indexTagsPath) = 0;
     virtual u_int32_t writeTags(string indexTagsPath) = 0;
+    virtual u_int32_t getnextid() = 0;
+
 };
 
 #endif // PASTEC_INDEX_H

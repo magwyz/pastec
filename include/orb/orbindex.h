@@ -66,12 +66,16 @@ public:
     u_int32_t loadTags(string indexTagsPath);
     u_int32_t writeTags(string indexTagsPath);
 
+    u_int32_t getnextid();
+
+
     void readLock();
     void unlock();
 
 private:
     u_int64_t nbOccurences[NB_VISUAL_WORDS];
     u_int64_t totalNbRecords;
+
     bool buildForwardIndex;
 
     unordered_map<u_int64_t, unsigned> nbWords;

@@ -41,9 +41,26 @@ ORBIndex::ORBIndex(string indexPath, bool buildForwardIndex)
     for (unsigned i = 0; i < NB_VISUAL_WORDS; ++i)
         nbOccurences[i] = 0;
 
-    load(indexPath);
+    load(indexPath);   
 }
 
+/**
+ * @brief Return the next free Slot of index.
+ *
+ * @return next index
+ */
+
+
+uint32_t ORBIndex::getnextid(){
+    std::vector<u_int32_t> vec;
+    this->getImageIds(vec);
+    for (u_int32_t i =0; i== vec.size();i++){
+        if (! std::count(vec.begin(), vec.end(), i))
+                return i;
+    }
+    return  1;
+
+}
 
 /**
  * @brief Return the number of occurences of a word in an whole index.
@@ -406,8 +423,8 @@ u_int32_t ORBIndex::write(string backwardIndexPath)
     ofs.close();
     cout << "Writing done." << endl;
 
+   // pthread_rwlonbWordsck_unlock(&rwLock);
     pthread_rwlock_unlock(&rwLock);
-
     return INDEX_WRITTEN;
 }
 
