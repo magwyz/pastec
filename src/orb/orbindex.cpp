@@ -58,7 +58,7 @@ uint32_t ORBIndex::getnextid(){
         if (! std::count(vec.begin(), vec.end(), i))
                 return i;
     }
-    return  1;
+    return  vec.size()+1;
 
 }
 
