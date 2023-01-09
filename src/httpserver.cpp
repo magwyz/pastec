@@ -88,7 +88,7 @@ int HTTPServer::run()
 
         daemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL,
                                   i_port, NULL, NULL,
-                                  &answerToConnection, this,
+                                  (MHD_AccessHandlerCallback)&answerToConnection, this,
                                   MHD_OPTION_NOTIFY_COMPLETED, requestCompleted, NULL,
                                   MHD_OPTION_HTTPS_MEM_KEY, key_pem,
                                   MHD_OPTION_HTTPS_MEM_CERT, cert_pem,
@@ -97,7 +97,7 @@ int HTTPServer::run()
     else
     {
         daemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, i_port, NULL, NULL,
-                                  &answerToConnection, this,
+                                  (MHD_AccessHandlerCallback)&answerToConnection, this,
                                   MHD_OPTION_NOTIFY_COMPLETED, requestCompleted,
                                   NULL, MHD_OPTION_END);
     }
@@ -202,7 +202,7 @@ int HTTPServer::answerToConnection(void *cls, MHD_Connection *connection,
         *conCls = (void *) conInfo;
 
         MHD_get_connection_values(connection, MHD_HEADER_KIND,
-                                  &readAuthHeader, conInfo);
+                                  (MHD_KeyValueIterator) &readAuthHeader, conInfo);
 
         return MHD_YES;
     }
