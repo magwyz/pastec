@@ -36,6 +36,13 @@ set(HEADERS      include/thread.h
                  include/httpserver.h
                  include/requesthandler.h)
 
+
+set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_INSTALL_RPATH "/tmp")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
@@ -55,3 +62,40 @@ target_link_libraries(pastec ${OpenCV_LIBS})
 target_link_libraries(pastec ${LIBMICROHTTPD_LIBRARY})
 target_link_libraries(pastec ${CURL_LIBRARIES})
 
+#target_include_directories(pastec ${OpenCV_INCLUDE_DIRS})
+#target_include_directories(pastec ${CMAKE_THREAD_INCLUDE_DIRS})
+
+#add_library(pastec SHARED  ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS} ${LIBMICROHTTPD_LIBRARY} ${CURL_LIBRARIES})
+
+
+#add_dependencies(pastec ${CMAKE_THREAD_LIBS_INIT} )
+#add_dependencies(pastec ${OpenCV_LIBS})
+#add_dependencies(pastec ${LIBMICROHTTPD_LIBRARY})
+#add_dependencies(pastec ${CURL_LIBRARIES} )
+target_include_directories(pastec PRIVATE ${CMAKE_THREAD_INCLUDE_DIRS}  ${ZLIB_INCLUDE_DIRS}
+${Boost_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${LIBMICROHTTPD_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS} )
+
+set ( pastec_INCLUDE_DIRS "include" )
+
+include_directories(${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
+
+#target_link_libraries(pastec ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS} ${LIBMICROHTTPD_LIBRARY} ${CURL_LIBRARIES})
+#target_link_libraries(pastec ${OpenCV_LIBS})
+#target_link_libraries(pastec ${LIBMICROHTTPD_LIBRARY})
+#target_link_libraries(pastec ${CURL_LIBRARIES})
+#target_include_directories(pastec PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${OpenCV_LIBS} ${LIBMICROHTTPD_LIBRARY} ${CURL_LIBRARIES})
+
+
+set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+#add_library(opencv SHARED ${OpenCV_INCLUDE_DIRS})
+#dd_executable(run ${RUN_FILES})
+#target_link_libraries(pastec opencv)
+
+#install(
+#  TARGETS pastec opencv
+#  RUNTIME DESTINATION bin
+#  LIBRARY DESTINATION lib
+#)

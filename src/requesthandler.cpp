@@ -125,6 +125,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     string p_ioIndex[] = {"index", "io", ""};
     string p_imageIds[] = {"index", "imageIds", ""};
     string p_root[] = {""};
+    string p_addent[] = {"index","images","append",""};
 
     Json::Value ret;
     conInfo.answerCode = MHD_HTTP_OK;
@@ -153,7 +154,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
             string imgURL = data["url"].asString();
             if (imgDownloader->canDownloadImage(imgURL))
             {
-                std::vector<char> imgData;
+                std::vector<u_char> imgData;
                 long HTTPResponseCode;
                 i_ret = imgDownloader->getImageData(imgURL, imgData, HTTPResponseCode);
                 if (i_ret == OK)
@@ -170,6 +171,62 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
         if (i_ret == IMAGE_ADDED)
             ret["nb_features_extracted"] = Json::Value(i_nbFeaturesExtracted);
     }
+
+    else if (testURIWithPattern(parsedURI, p_addent)
+        && conInfo.connectionType == PUT)
+    {
+        u_int32_t i_imageId;
+        //u_int32_t i_imageId = atoi(parsedURI[2].c_str());
+       /* vector<u_int32_t> imageIds;
+
+        index->getImageIds(imageIds);
+
+        if (imageIds.size() != 0){
+         i_imageId = imageIds.back();
+         i_imageId++;
+        }
+        else
+        {
+           i_imageId = 1;
+        }
+        */
+        i_imageId = index->getnextid();
+
+        std::cout << i_imageId;
+        unsigned i_nbFeaturesExtracted;
+        u_int32_t i_ret = featureExtractor->processNewImage(
+            i_imageId, conInfo.uploadedData.size(), conInfo.uploadedData.data(),
+            i_nbFeaturesExtracted);
+
+        if (i_ret == IMAGE_NOT_DECODED)
+        {
+            // Check if the data is an image URL to load
+            string dataStr(conInfo.uploadedData.begin(),
+                           conInfo.uploadedData.end());
+
+            Json::Value data = StringToJson(dataStr);
+            string imgURL = data["url"].asString();
+            if (imgDownloader->canDownloadImage(imgURL))
+            {
+                std::vector<u_char> imgData;
+                long HTTPResponseCode;
+                i_ret = imgDownloader->getImageData(imgURL, imgData, HTTPResponseCode);
+                if (i_ret == OK)
+                    i_ret = featureExtractor->processNewImage(
+                        i_imageId, imgData.size(), imgData.data(),
+                        i_nbFeaturesExtracted);
+                else
+                    ret["image_downloader_http_response_code"] = (Json::Int64)HTTPResponseCode;
+            }
+        }
+
+        ret["type"] = Converter::codeToString(i_ret);
+        ret["image_id"] = Json::Value(i_imageId);
+        if (i_ret == IMAGE_ADDED)
+            ret["nb_features_extracted"] = Json::Value(i_nbFeaturesExtracted);
+    }
+
+
     else if (testURIWithPattern(parsedURI, p_image)
              && conInfo.connectionType == DELETE)
     {
@@ -219,7 +276,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
             string imgURL = data["url"].asString();
             if (imgDownloader->canDownloadImage(imgURL))
             {
-                std::vector<char> imgData;
+                std::vector<u_char> imgData;
                 long HTTPResponseCode;
                 i_ret = imgDownloader->getImageData(imgURL, imgData, HTTPResponseCode);
                 if (i_ret == OK)

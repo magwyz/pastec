@@ -78,7 +78,7 @@ struct ConnectionInfo
     int answerCode;
     string authKey;
 
-    vector<char> uploadedData;
+    vector<u_char> uploadedData;
 };
 
 #endif // PASTEC_HTTPSERVER_H

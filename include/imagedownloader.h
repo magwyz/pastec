@@ -36,7 +36,7 @@ public:
     ImageDownloader();
 
     bool canDownloadImage(std::string imgURL);
-    u_int32_t getImageData(std::string imgURL, std::vector<char> &imgData,
+    u_int32_t getImageData(std::string imgURL, std::vector<u_char> &imgData,
                            long &responseCode);
 
 private:

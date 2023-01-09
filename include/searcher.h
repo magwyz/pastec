@@ -36,7 +36,7 @@ class ClientConnection;
 struct SearchRequest
 {
     u_int32_t imageId;
-    vector<char> imageData;
+    vector<u_char> imageData;
     ClientConnection *client;
     vector<u_int32_t> results;
     vector<Rect> boundingRects;
